@@ -1,24 +1,26 @@
-﻿using System.Text;
+﻿using GovAuthSDK;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GovTransportApp
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow: Window
     {
+        GovAuthService service;
+
         public MainWindow()
         {
+            service = new GovAuthService();
+
             InitializeComponent();
+        }
+
+        private async void ButtonLogIn_Click(object sender, RoutedEventArgs e)
+        {
+            var user = await service.LoginAuth(TBoxLogin.Text, TBoxPassword.Text);
+
+            var users = await service.AllUsers();
+
+            MessageBox.Show($"Succesfully login by {user.Login}\nUsers count: {users.Count()}");
         }
     }
 }

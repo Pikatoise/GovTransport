@@ -6,7 +6,17 @@
         xmlns:local="clr-namespace:GovTransportApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+		<TextBox
+			x:Name="TBoxLogin"
+			Width="200" Margin="0 0 0 10"/>
+		<TextBox
+			x:Name="TBoxPassword"
+			Width="200" Margin="0 0 0 20"/>
 
-    </Grid>
+		<Button
+			x:Name="ButtonLogIn" 
+			Content="Войти"
+			Click="ButtonLogIn_Click"/>
+	</StackPanel>
 </Window>
