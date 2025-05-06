@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GovAuthSDK\GovAuthSDK.csproj" />
+    <ProjectReference Include="..\GovTransportSDK\GovTransportSDK.csproj" />
   </ItemGroup>
 
 </Project>

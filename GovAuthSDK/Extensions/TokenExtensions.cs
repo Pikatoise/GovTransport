@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace GovAuthSDK.Extensions
 {
-    public static class TokenExtensions
+    internal static class TokenExtensions
     {
         public static TokenDto ToDto(this Token token)
         {

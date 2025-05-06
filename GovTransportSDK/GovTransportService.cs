@@ -1,0 +1,393 @@
+﻿using GovAuthSDK;
+using GovAuthSDK.Enums;
+using GovTransportSDK.DTO;
+using GovTransportSDK.Exceptions;
+using GovTransportSDK.Extensions;
+using GovTransportSDK.Helpers;
+using GovTransportSDK.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace GovTransportSDK
+{
+    public sealed class GovTransportService
+    {
+        private AccessLevel _accessLevel = AccessLevel.Low;
+
+        public GovTransportService()
+        {
+            using var context = new GovTransportContext();
+            context.Database.EnsureCreatedAsync();
+            context.Database.CanConnectAsync();
+        }
+
+        public async Task<string> Auth(string token)
+        {
+            var authService = new GovAuthService();
+            var authResult = await authService.TokenAuth(token);
+
+            _accessLevel = authResult.AccessLevel;
+
+            return authResult.Description;
+        }
+
+        public async Task<string> Auth(string login, string password)
+        {
+            var authService = new GovAuthService();
+            var authResult = await authService.LoginAuth(login, password);
+
+            _accessLevel = authResult.AccessLevel;
+
+            return authResult.Login;
+        }
+
+        #region Ownership
+
+        /// <summary>
+        /// Low access level
+        /// </summary>
+        public async Task<VinInfoDto> InfoByVin(string vin)
+        {
+            using var context = new GovTransportContext();
+
+            var transportDb = await context.Transports.FirstOrDefaultAsync(x => x.VIN == vin);
+
+            if (transportDb == null)
+                throw new TransportNotFoundException(vin);
+
+            var historiesDb = await context.OwnerHistories
+                .AsNoTracking()
+                .Include(x => x.Ownership)
+                .Where(x => x.TransportId == transportDb.Id)
+                .ToListAsync();
+
+            return new VinInfoDto()
+            {
+                Transport = transportDb.ToDto(),
+                History = historiesDb.Select(x => x.ToMinimizedDto())
+            };
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<Ownership>> AllOwners()
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var ownersDb = await context.Owners.AsNoTracking().ToListAsync();
+
+            return ownersDb;
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<Ownership> OwnerById(Guid id)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var ownerDb = await context.Owners.FindAsync(id);
+
+            if (ownerDb == null)
+                throw new OwnerNotFoundException(id);
+
+            return ownerDb;
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<Ownership>> FindOwnersByPassport(string passport)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var ownersDb = await context.Owners
+                .AsNoTracking()
+                .Where(x => EF.Functions.Like(x.Passport, $"%{passport}%"))
+                .ToListAsync();
+
+            return ownersDb;
+        }
+
+        /// <summary>
+        /// High access level
+        /// </summary>
+        public async void AddOwnership(AddOwnershipDto dto)
+        {
+            if (_accessLevel != AccessLevel.High)
+                throw new NoAccessException(AccessLevel.High.ToString());
+
+            using var context = new GovTransportContext();
+
+            var ownerWithSamePassport = await context.Owners
+                .AsNoTracking()
+                .SingleOrDefaultAsync(x => EF.Functions.Like(x.Passport, $"{dto.Passport}"));
+
+            if (ownerWithSamePassport != null)
+                throw new OwnerWithSamePassportExistsException(dto.Passport);
+
+            Ownership newOwnership = new Ownership(dto.FullName, dto.RegistrationAddress, dto.Passport, dto.Osago, dto.IsLegal);
+
+            await context.Owners.AddAsync(newOwnership);
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// High access level
+        /// </summary>
+        public async void UpdateOwnership(Ownership changedOwner)
+        {
+            if (_accessLevel != AccessLevel.High)
+                throw new NoAccessException(AccessLevel.High.ToString());
+
+            using var context = new GovTransportContext();
+
+            var ownerWithSameId = await context.Owners.FindAsync(changedOwner.Id);
+
+            if (ownerWithSameId == null)
+                throw new OwnerNotFoundException(changedOwner.Id);
+
+            context.Owners.Update(changedOwner);
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<OwnerHistoryDetailedDto>> OwnershipTransportsHistory(Guid ownerId)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var owner = await context.Owners.FindAsync(ownerId);
+
+            if (owner == null)
+                throw new OwnerNotFoundException(ownerId);
+
+            var ownerTransportHistories = await context.OwnerHistories
+                .AsNoTracking()
+                .Where(x => x.OwnershipId == ownerId)
+                .Include(x => x.Transport)
+                .Include(x => x.Ownership)
+                .ToListAsync();
+
+            return ownerTransportHistories.Select(x => x.ToDetailedDto());
+        }
+
+        #endregion
+
+        #region Transport
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<Transport>> AllTransports()
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportsDb = await context.Transports.AsNoTracking().ToListAsync();
+
+            return transportsDb;
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<Transport> TransportById(Guid id)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportDb = await context.Transports.FindAsync(id);
+
+            if (transportDb == null)
+                throw new TransportNotFoundException(id);
+
+            return transportDb;
+        }
+
+        /// <summary>
+        /// High access level
+        /// </summary>
+        public async void AddTransport(AddTransportDto dto)
+        {
+            if (_accessLevel != AccessLevel.High)
+                throw new NoAccessException(AccessLevel.High.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportWithSameVin = await context.Transports
+                .AsNoTracking()
+                .SingleOrDefaultAsync(x => EF.Functions.Like(x.VIN, $"{dto.VIN}"));
+
+            if (transportWithSameVin != null)
+                throw new TransportWithSameVinExistsException(dto.VIN);
+
+            string govNumber = await GenerateUniqueGovNumber(dto.RegionCode);
+
+            Transport newTransport = new Transport(dto.VIN, dto.Model, dto.ReleaseYear, dto.Color, govNumber, dto.Status, dto.BodyType);
+
+            await context.Transports.AddAsync(newTransport);
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<Transport>> FindTransportsByVIN(string vin)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportsDb = await context.Transports
+                .AsNoTracking()
+                .Where(x => EF.Functions.Like(x.VIN, $"%{vin}%"))
+                .ToListAsync();
+
+            return transportsDb;
+        }
+
+        /// <summary>
+        /// High access level
+        /// </summary>
+        public async void UpdateTransport(Transport changedTransport)
+        {
+            if (_accessLevel != AccessLevel.High)
+                throw new NoAccessException(AccessLevel.High.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportWithSameID = await context.Transports.FindAsync(changedTransport.Id);
+
+            if (transportWithSameID == null)
+                throw new TransportNotFoundException(changedTransport.Id);
+
+            context.Transports.Update(changedTransport);
+
+            await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<OwnerHistoryDetailedDto>> TransportOwnersHistory(Guid transportId)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transport = await context.Transports.FindAsync(transportId);
+
+            if (transport == null)
+                throw new TransportNotFoundException(transportId);
+
+            var transportOwnersHistories = await context.OwnerHistories
+                .AsNoTracking()
+                .Where(x => x.TransportId == transportId)
+                .Include(x => x.Transport)
+                .Include(x => x.Ownership)
+                .ToListAsync();
+
+            return transportOwnersHistories.Select(x => x.ToDetailedDto());
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<Ownership> LastOwnerByTransportId(Guid transportId)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transport = await context.Transports.FindAsync(transportId);
+
+            if (transport == null)
+                throw new TransportNotFoundException(transportId);
+
+            var lastOwner = await context.OwnerHistories
+                .AsNoTracking()
+                .Include(x => x.Ownership)
+                .LastAsync(x => x.TransportId == transportId);
+
+            return lastOwner.Ownership;
+        }
+
+        private async Task<string> GenerateUniqueGovNumber(string regionCode)
+        {
+            using var context = new GovTransportContext();
+
+            string newGovNumber = "";
+
+            while (true)
+            {
+                newGovNumber = GovNumberHelper.GenerateGovNumber(regionCode);
+
+                bool isUnique = await context.Transports.AnyAsync(x => EF.Functions.Like(x.GovNumber, $"{newGovNumber}"));
+
+                if (!isUnique)
+                    break;
+            }
+
+            return newGovNumber;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Required High level access
+        /// </summary>
+        public async void TransportOwnerRegistration(Guid ownerId, Guid transportId)
+        {
+            if (_accessLevel != AccessLevel.High)
+                throw new NoAccessException(AccessLevel.High.ToString());
+
+            using var context = new GovTransportContext();
+
+            var owner = await context.Owners.FindAsync(ownerId);
+            if (owner == null)
+                throw new OwnerNotFoundException(ownerId);
+
+            var transport = await context.Transports.FindAsync(transportId);
+            if (transport == null)
+                throw new TransportNotFoundException(transportId);
+
+            var lastOwnerHistory = await context.OwnerHistories.AsNoTracking().LastOrDefaultAsync(x => x.TransportId == transportId);
+            if (lastOwnerHistory != null && lastOwnerHistory.End == null)
+            {
+                lastOwnerHistory.End = DateTime.UtcNow;
+
+                context.OwnerHistories.Update(lastOwnerHistory);
+            }
+
+            var newHistory = new OwnerHistory(transportId, ownerId, DateTime.UtcNow, null);
+
+            await context.OwnerHistories.AddAsync(newHistory);
+
+            await context.SaveChangesAsync();
+        }
+    }
+}

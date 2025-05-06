@@ -1,4 +1,4 @@
-﻿namespace GovAuthSDK.Exceptions
+﻿namespace GovTransportSDK.Exceptions
 {
     public class NoAccessException: Exception
     {

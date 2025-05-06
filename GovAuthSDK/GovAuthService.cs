@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovAuthSDK
 {
-    public class GovAuthService
+    public sealed class GovAuthService
     {
         private AccessLevel _accessLevel = AccessLevel.Low;
 
@@ -26,7 +26,7 @@ namespace GovAuthSDK
             if (JwtHelper.ValidateToken(token) == null)
                 throw new InvalidTokenException(token);
 
-            var dbToken = await context.Tokens.FirstOrDefaultAsync(x => x.AuthToken == token);
+            var dbToken = await context.Tokens.AsNoTracking().FirstOrDefaultAsync(x => x.AuthToken == token);
 
             if (dbToken == null)
                 throw new InvalidTokenException(token);
@@ -40,7 +40,7 @@ namespace GovAuthSDK
         {
             using var context = new GovAuthContext();
 
-            var dbUser = await context.Users.FirstOrDefaultAsync(x => x.Login == login);
+            var dbUser = await context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Login == login);
 
             if (dbUser == null)
                 throw new UserNotFoundException(login);
@@ -53,26 +53,32 @@ namespace GovAuthSDK
             return dbUser.ToDto();
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
         public async Task<IEnumerable<UserDto>> AllUsers()
         {
             if (_accessLevel != AccessLevel.High)
-                throw new NoAccessException(null);
+                throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
-            var dbUsers = await context.Users.ToListAsync();
+            var dbUsers = await context.Users.AsNoTracking().ToListAsync();
 
             return dbUsers.Select(x => x.ToDto());
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
         public async void AddUser(string login, string password, AccessLevel accessLevel)
         {
             if (_accessLevel != AccessLevel.High)
-                throw new NoAccessException(null);
+                throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
-            var isExistUserWithSameLogin = await context.Users.AnyAsync(x => x.Login == login);
+            var isExistUserWithSameLogin = await context.Users.AsNoTracking().AnyAsync(x => x.Login == login);
 
             if (isExistUserWithSameLogin)
                 throw new ExistUserWithSameLoginException(login);
@@ -80,39 +86,52 @@ namespace GovAuthSDK
             var newUser = new User(login, HashHelper.HashPassword(password), accessLevel);
 
             await context.Users.AddAsync(newUser);
+
+            await context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
         public async void DeleteUser(Guid id)
         {
             if (_accessLevel != AccessLevel.High)
-                throw new NoAccessException(null);
+                throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
-            var user = await context.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var user = await context.Users.FindAsync(id);
 
             if (user == null)
                 throw new UserNotFoundException(id);
 
             context.Remove(user);
+
+            await context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
         public async Task<IEnumerable<TokenDto>> AllTokens()
         {
             if (_accessLevel != AccessLevel.High)
-                throw new NoAccessException(null);
+                throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
-            var dbTokens = await context.Tokens.ToListAsync();
+            var dbTokens = await context.Tokens.AsNoTracking().ToListAsync();
 
             return dbTokens.Select(x => x.ToDto());
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
         public async Task<string> AddToken(string owner, DateTime cancellation)
         {
             if (_accessLevel != AccessLevel.High)
-                throw new NoAccessException(null);
+                throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
@@ -120,22 +139,29 @@ namespace GovAuthSDK
 
             await context.Tokens.AddAsync(newToken);
 
+            await context.SaveChangesAsync();
+
             return newToken.AuthToken;
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
         public async void DeleteToken(Guid id)
         {
             if (_accessLevel != AccessLevel.High)
-                throw new NoAccessException(null);
+                throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
-            var token = await context.Tokens.FirstOrDefaultAsync(x => x.Id == id);
+            var token = await context.Tokens.FindAsync(id);
 
             if (token == null)
                 throw new TokenNotFoundException(id);
 
             context.Remove(token);
+
+            await context.SaveChangesAsync();
         }
     }
 }

@@ -3,7 +3,7 @@ using GovAuthSDK.Models;
 
 namespace GovAuthSDK.Extensions
 {
-    public static class UserExtensions
+    internal static class UserExtensions
     {
         public static UserDto ToDto(this User user)
         {

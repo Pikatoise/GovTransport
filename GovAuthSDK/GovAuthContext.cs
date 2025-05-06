@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovAuthSDK
 {
-    internal class GovAuthContext: DbContext
+    internal sealed class GovAuthContext: DbContext
     {
         private readonly string _dbPath = "auth.db";
 
