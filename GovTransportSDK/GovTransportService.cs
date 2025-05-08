@@ -17,7 +17,7 @@ namespace GovTransportSDK
         {
             using var context = new GovTransportContext();
             context.Database.EnsureCreatedAsync();
-            context.Database.CanConnectAsync();
+            context.Owners.FirstOrDefault();
         }
 
         public async Task<string> Auth(string token)

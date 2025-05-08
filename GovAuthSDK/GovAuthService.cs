@@ -16,7 +16,7 @@ namespace GovAuthSDK
         {
             using var context = new GovAuthContext();
             context.Database.EnsureCreatedAsync();
-            context.Database.CanConnectAsync();
+            context.Users.FirstOrDefault();
         }
 
         public async Task<TokenDto> TokenAuth(string token)
