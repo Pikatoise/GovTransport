@@ -28,7 +28,10 @@ namespace GovTransportApp.Windows
             {
                 var user = await _authService.LoginAuth(login, password);
 
-                MessageBox.Show("Ok");
+                ((App)Application.Current).MainWindow = new MainWindow(user);
+                ((App)Application.Current).MainWindow.Show();
+
+                Close();
             }
             catch (Exception ex)
             {

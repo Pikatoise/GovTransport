@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace GovTransportApp.Controls
+namespace GovTransportApp.Pages
 {
     /// <summary>
-    /// Interaction logic for SampleMessageDialog.xaml
+    /// Interaction logic for OwnersPage.xaml
     /// </summary>
-    public partial class SampleMessageDialog: UserControl
+    public partial class OwnersPage : UserControl
     {
-        public SampleMessageDialog()
+        public OwnersPage()
         {
             InitializeComponent();
         }
