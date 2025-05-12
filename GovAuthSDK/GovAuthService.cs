@@ -71,7 +71,7 @@ namespace GovAuthSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void AddUser(string login, string password, AccessLevel accessLevel)
+        public async Task AddUser(string login, string password, AccessLevel accessLevel)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -93,7 +93,7 @@ namespace GovAuthSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void DeleteUser(Guid id)
+        public async Task DeleteUser(Guid id)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -147,19 +147,19 @@ namespace GovAuthSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void DeleteToken(Guid id)
+        public async Task DeleteToken(string token)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
 
             using var context = new GovAuthContext();
 
-            var token = await context.Tokens.FindAsync(id);
+            var tokenDb = await context.Tokens.AsNoTracking().SingleOrDefaultAsync(x => EF.Functions.Like(x.AuthToken, token));
 
-            if (token == null)
-                throw new TokenNotFoundException(id);
+            if (tokenDb == null)
+                throw new TokenNotFoundException(token);
 
-            context.Remove(token);
+            context.Remove(tokenDb);
 
             await context.SaveChangesAsync();
         }

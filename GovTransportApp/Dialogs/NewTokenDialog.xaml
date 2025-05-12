@@ -1,0 +1,76 @@
+﻿<Window x:Class="GovTransportApp.Dialogs.NewTokenDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GovTransportApp.Dialogs"
+		xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+		mc:Ignorable="d"
+		Title="Токен"
+	    Height="150"
+	    Width="300"
+	    WindowStartupLocation="CenterScreen"
+	    WindowStyle="SingleBorderWindow"
+	    ResizeMode="CanMinimize"
+	    Background="#f4f6f9"
+		Loaded="Window_Loaded">
+    <Grid Margin="20">
+		<Grid VerticalAlignment="Top">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="0.2*"/>
+			</Grid.ColumnDefinitions>
+			
+			<TextBox
+				x:Name="TBoxGeneratedToken"
+				Grid.Column="0"
+				Height="35"
+				Padding="10 0"
+				BorderBrush="#3f51b5"
+				BorderThickness="2"
+				FontSize="12"
+				IsReadOnly="True"
+				HorizontalAlignment="Stretch"
+				materialDesign:HintAssist.Hint="Ваш токен..." />
+
+			<Button
+				x:Name="ButtonCopyToken"
+				Click="ButtonCopyToken_Click"
+				Grid.Column="1"
+				FontSize="16"
+				Height="35"
+				Width="35"
+				Padding="0"
+				HorizontalAlignment="Stretch"
+				Background="Transparent"
+				Foreground="White"
+				FontWeight="SemiBold"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				materialDesign:ButtonAssist.CornerRadius="5">
+				<materialDesign:PackIcon 
+					Kind="ContentCopy"
+					Foreground="Black"/>
+			</Button>
+		</Grid>
+		
+
+		<Button
+			Click="Button_Click"
+			Content="Ок"
+			FontSize="16"
+			Height="35"
+			Width="45"
+			Padding="0"
+			HorizontalAlignment="Stretch"
+			Background="#3f51b5"
+			Foreground="White"
+			FontWeight="SemiBold"
+			BorderBrush="#3f51b5"
+			BorderThickness="2"
+			materialDesign:ButtonAssist.CornerRadius="5"
+			VerticalAlignment="Bottom" />
+	</Grid>
+</Window>

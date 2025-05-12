@@ -1,28 +1,97 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GovAuthSDK;
+using GovAuthSDK.DTO;
+using GovTransportApp.Dialogs;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace GovTransportApp.Pages
 {
-    /// <summary>
-    /// Interaction logic for SettingsPage.xaml
-    /// </summary>
-    public partial class SettingsPage : UserControl
+    public partial class SettingsPage: UserControl
     {
+        GovAuthService _authService;
+
         public SettingsPage()
         {
             InitializeComponent();
+
+            _authService = ((App)Application.Current).AuthService!;
+        }
+
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            var users = await _authService.AllUsers();
+            var tokens = await _authService.AllTokens();
+
+            DGridUsers.ItemsSource = users;
+            DGridTokens.ItemsSource = tokens;
+        }
+
+        private async void ButtonAddUser_Click(object sender, RoutedEventArgs e)
+        {
+            var addUserDialog = new AddUserDialog();
+
+            addUserDialog.ShowDialog();
+
+            if (addUserDialog.IsFinished)
+            {
+                var users = await _authService.AllUsers();
+                DGridUsers.ItemsSource = users;
+            }
+        }
+
+        private async void ButtonRemoveUser_Click(object sender, RoutedEventArgs e)
+        {
+            UserDto? selectedItem = DGridUsers.SelectedItem as UserDto;
+
+            if (selectedItem == null)
+            {
+                MessageBox.Show("Выберите пользователя!");
+                return;
+            }
+
+            var result = MessageBox.Show($"Удалить пользователя {selectedItem.Login}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.No)
+                return;
+
+            await _authService.DeleteUser(selectedItem.Id);
+
+            var users = await _authService.AllUsers();
+            DGridUsers.ItemsSource = users;
+        }
+
+        private async void ButtonAddToken_Click(object sender, RoutedEventArgs e)
+        {
+            var addTokenDialog = new AddTokenDialog();
+
+            addTokenDialog.ShowDialog();
+
+            if (addTokenDialog.IsFinished)
+            {
+                var tokens = await _authService.AllTokens();
+                DGridTokens.ItemsSource = tokens;
+            }
+        }
+
+        private async void ButtonRemoveToken_Click(object sender, RoutedEventArgs e)
+        {
+            TokenDto? selectedItem = DGridTokens.SelectedItem as TokenDto;
+
+            if (selectedItem == null)
+            {
+                MessageBox.Show("Выберите токен!");
+                return;
+            }
+
+            var result = MessageBox.Show($"Удалить токен {selectedItem.Description}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.No)
+                return;
+
+            await _authService.DeleteToken(selectedItem.TokenValue);
+
+            var tokens = await _authService.AllTokens();
+            DGridTokens.ItemsSource = tokens;
         }
     }
 }

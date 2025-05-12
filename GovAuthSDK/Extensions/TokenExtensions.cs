@@ -11,8 +11,10 @@ namespace GovAuthSDK.Extensions
         {
             return new TokenDto()
             {
+                TokenValue = token.AuthToken,
                 AccessLevel = token.AccessLevel,
-                Description = JwtHelper.ValidateToken(token.AuthToken).Claims.FirstOrDefault(x => x.ValueType.Equals(ClaimTypes.Name)).Value
+                End = JwtHelper.ValidateToken(token.AuthToken).Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Version)).Value,
+                Description = JwtHelper.ValidateToken(token.AuthToken).Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name)).Value
             };
         }
     }

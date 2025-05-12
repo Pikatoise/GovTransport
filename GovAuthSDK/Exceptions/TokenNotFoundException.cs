@@ -9,5 +9,9 @@
         public TokenNotFoundException(Guid id) : base($"Token with id '{id}' not found.")
         {
         }
+
+        public TokenNotFoundException(string token) : base($"Token '{token}' was not found.")
+        {
+        }
     }
 }

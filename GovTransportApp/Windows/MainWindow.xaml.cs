@@ -38,7 +38,7 @@ namespace GovTransportApp.Windows
             ChangePage(new OwnersPage());
         }
 
-        private void ButtonSettings_Click(object sender, RoutedEventArgs e)
+        private async void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
             ChangePage(new SettingsPage());
         }

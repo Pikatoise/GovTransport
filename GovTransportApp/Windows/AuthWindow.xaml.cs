@@ -1,4 +1,5 @@
 ﻿using GovAuthSDK;
+using GovAuthSDK.Enums;
 using GovAuthSDK.Exceptions;
 using System.Windows;
 
@@ -27,6 +28,13 @@ namespace GovTransportApp.Windows
             try
             {
                 var user = await _authService.LoginAuth(login, password);
+
+                if (user.AccessLevel != AccessLevel.High)
+                {
+                    MessageBox.Show("Недостаточно прав!", "Отказ", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    return;
+                }
 
                 ((App)Application.Current).MainWindow = new MainWindow(user);
                 ((App)Application.Current).MainWindow.Show();

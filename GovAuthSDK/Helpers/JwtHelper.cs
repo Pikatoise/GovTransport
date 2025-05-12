@@ -7,7 +7,7 @@ namespace GovAuthSDK.Helpers
 {
     internal class JwtHelper
     {
-        private const string SECRET_KEY = "denis_golovkin";
+        private const string SECRET_KEY = "denis_golovkin_denis_golovkin_denis_golovkin";
         private static readonly byte[] Key = Encoding.UTF8.GetBytes(SECRET_KEY);
 
         public static string GenerateToken(string owner, DateTime cancellation)
