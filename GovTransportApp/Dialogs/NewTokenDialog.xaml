@@ -39,17 +39,12 @@
 				x:Name="ButtonCopyToken"
 				Click="ButtonCopyToken_Click"
 				Grid.Column="1"
-				FontSize="16"
 				Height="35"
 				Width="35"
 				Padding="0"
-				HorizontalAlignment="Stretch"
 				Background="Transparent"
-				Foreground="White"
-				FontWeight="SemiBold"
 				BorderBrush="Transparent"
-				BorderThickness="0"
-				materialDesign:ButtonAssist.CornerRadius="5">
+				BorderThickness="0">
 				<materialDesign:PackIcon 
 					Kind="ContentCopy"
 					Foreground="Black"/>

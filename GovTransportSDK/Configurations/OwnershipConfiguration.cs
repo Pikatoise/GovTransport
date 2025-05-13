@@ -16,7 +16,7 @@ namespace GovTransportSDK.Configurations
             builder.Property(x => x.Osago);
             builder.Property(x => x.IsLegal);
 
-            builder.HasMany(x => x.TransportHistory).WithOne(x => x.Ownership);
+            builder.HasMany(x => x.TransportsHistory).WithOne(x => x.Ownership);
 
             builder.HasData(new List<Ownership>()
             {

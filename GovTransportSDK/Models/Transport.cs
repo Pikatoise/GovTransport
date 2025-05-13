@@ -15,7 +15,7 @@ namespace GovTransportSDK.Models
         public TransportStatus Status { get; set; }
         public BodyType BodyType { get; set; }
 
-        public IEnumerable<OwnerHistory> OwnerHistory { get; set; } = [];
+        public ICollection<OwnerHistory> OwnersHistory { get; set; } = new List<OwnerHistory>();
 
         public Transport()
         {

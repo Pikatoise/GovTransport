@@ -103,6 +103,24 @@ namespace GovTransportSDK
         /// <summary>
         /// Medium access level
         /// </summary>
+        public async Task<Ownership> OwnerByPassport(string passport)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var ownerDb = await context.Owners.SingleOrDefaultAsync(x => EF.Functions.Like(x.Passport, $"{passport}"));
+
+            if (ownerDb == null)
+                throw new OwnerNotFoundException(passport);
+
+            return ownerDb;
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
         public async Task<IEnumerable<Ownership>> FindOwnersByPassport(string passport)
         {
             if (_accessLevel == AccessLevel.Low)
@@ -165,7 +183,7 @@ namespace GovTransportSDK
         /// <summary>
         /// Medium access level
         /// </summary>
-        public async Task<IEnumerable<OwnerHistoryDetailedDto>> OwnershipTransportsHistory(Guid ownerId)
+        public async Task<List<OwnerHistoryDetailedDto>> OwnershipTransportsHistory(Guid ownerId)
         {
             if (_accessLevel == AccessLevel.Low)
                 throw new NoAccessException(AccessLevel.Medium.ToString());
@@ -179,12 +197,11 @@ namespace GovTransportSDK
 
             var ownerTransportHistories = await context.OwnerHistories
                 .AsNoTracking()
-                .Where(x => x.OwnershipId == ownerId)
                 .Include(x => x.Transport)
-                .Include(x => x.Ownership)
+                .Where(x => x.OwnershipId == ownerId)
                 .ToListAsync();
 
-            return ownerTransportHistories.Select(x => x.ToDetailedDto());
+            return ownerTransportHistories.Select(x => x.ToDetailedDto()).ToList();
         }
 
         #endregion

@@ -1,4 +1,7 @@
-﻿using GovTransportSDK.Models;
+﻿using GovTransportApp.Dialogs;
+using GovTransportSDK.DTO;
+using GovTransportSDK.Enums;
+using GovTransportSDK.Models;
 using MaterialDesignThemes.Wpf;
 using System.ComponentModel;
 using System.Windows;
@@ -32,6 +35,7 @@ namespace GovTransportApp.Pages
             _searchTimer.Interval = TimeSpan.FromMilliseconds(SearchDelayMs);
             _searchTimer.Tick += SearchTimer_Tick;
 
+            LBoxOwners.ItemsSource = null;
             LBoxOwners.Items.Clear();
 
             var owners = await ((App)Application.Current).TransportService!.AllOwners();
@@ -45,9 +49,36 @@ namespace GovTransportApp.Pages
             LoadOwnersToListBox(owners);
         }
 
-        private void LBoxOwners_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void LBoxOwners_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var selectedItem = LBoxOwners.SelectedItem as ListBoxItem;
 
+            if (selectedItem != null)
+            {
+                Ownership selectedOwner = (selectedItem.Tag as Ownership)!;
+
+                IconOwnerType.Kind = selectedOwner.IsLegal ? PackIconKind.BriefcaseUser : PackIconKind.UserCircle;
+                TBlockOwnerFullName.Text = selectedOwner.FullName;
+                TBlockPassport.Text = selectedOwner.Passport;
+                TBlockAddress.Text = selectedOwner.RegistrationAddress;
+                TBlockOsago.Text = string.IsNullOrEmpty(selectedOwner.Osago) ? "-" : selectedOwner.Osago;
+
+                var ownerTransportsHistory = await ((App)Application.Current).TransportService!.OwnershipTransportsHistory(selectedOwner.Id);
+
+                LBoxOwnerTransports.ItemsSource = null;
+                LBoxOwnerTransports.Items.Clear();
+
+                if (ownerTransportsHistory.Count() != 0)
+                {
+                    TBlockOwnerTransportsEmpty.Visibility = Visibility.Hidden;
+
+                    LoadOwnerTransportsToListBox(ownerTransportsHistory);
+                }
+                else
+                    TBlockOwnerTransportsEmpty.Visibility = Visibility.Visible;
+
+                GridOwnerInfo.Visibility = Visibility.Visible;
+            }
         }
 
         private void TBoxPassportSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -74,9 +105,73 @@ namespace GovTransportApp.Pages
             else
                 TBlockEmptyOwners.Visibility = Visibility.Visible;
 
+            LBoxOwners.ItemsSource = null;
             LBoxOwners.Items.Clear();
 
             LoadOwnersToListBox(owners);
+        }
+
+        private async void ButtonAddOwner_Click(object sender, RoutedEventArgs e)
+        {
+            var addOwnerDialog = new AddOwnerDialog();
+
+            addOwnerDialog.ShowDialog();
+
+            if (addOwnerDialog.IsFinished)
+            {
+                LBoxOwners.ItemsSource = null;
+                LBoxOwners.Items.Clear();
+
+                TBoxPassportSearch.TextChanged -= TBoxPassportSearch_TextChanged;
+                TBoxPassportSearch.Text = string.Empty;
+                TBoxPassportSearch.TextChanged -= TBoxPassportSearch_TextChanged;
+
+                var owners = await ((App)Application.Current).TransportService!.AllOwners();
+
+                if (owners.Count() == 0)
+                {
+                    TBlockEmptyOwners.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                LoadOwnersToListBox(owners);
+            }
+        }
+
+        private async void ButtonEditOwner_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = LBoxOwners.SelectedItem as ListBoxItem;
+
+            if (selectedItem != null)
+            {
+                Ownership selectedOwner = (selectedItem.Tag as Ownership)!;
+
+                var addOwnerDialog = new AddOwnerDialog(selectedOwner);
+
+                addOwnerDialog.ShowDialog();
+
+                if (addOwnerDialog.IsFinished)
+                {
+                    GridOwnerInfo.Visibility = Visibility.Hidden;
+
+                    LBoxOwners.ItemsSource = null;
+                    LBoxOwners.Items.Clear();
+
+                    TBoxPassportSearch.TextChanged -= TBoxPassportSearch_TextChanged;
+                    TBoxPassportSearch.Text = string.Empty;
+                    TBoxPassportSearch.TextChanged -= TBoxPassportSearch_TextChanged;
+
+                    var owners = await ((App)Application.Current).TransportService!.AllOwners();
+
+                    if (owners.Count() == 0)
+                    {
+                        TBlockEmptyOwners.Visibility = Visibility.Visible;
+                        return;
+                    }
+
+                    LoadOwnersToListBox(owners);
+                }
+            }
         }
 
         private void LoadOwnersToListBox(IEnumerable<Ownership> owners)
@@ -115,7 +210,6 @@ namespace GovTransportApp.Pages
                 Canvas.SetTop(tbPassport, 12);
                 Canvas.SetTop(tbFullName, 40);
 
-
                 canvas.Children.Add(icon);
                 canvas.Children.Add(tbPassport);
                 canvas.Children.Add(tbFullName);
@@ -123,6 +217,79 @@ namespace GovTransportApp.Pages
                 lbitem.Content = canvas;
 
                 LBoxOwners.Items.Add(lbitem);
+            }
+        }
+
+        private void LoadOwnerTransportsToListBox(IEnumerable<OwnerHistoryDetailedDto> histories)
+        {
+            foreach (var history in histories)
+            {
+                ListBoxItem lbitem = new ListBoxItem();
+
+                Canvas canvas = new Canvas() { Height = 70 };
+
+                TextBlock tbGovNumber = new TextBlock()
+                {
+                    Text = history.Transport.GovNumber,
+                    FontSize = 16,
+                    FontWeight = FontWeights.SemiBold,
+                    TextWrapping = TextWrapping.Wrap,
+                    FontFamily = new FontFamily("Arial"),
+                    Width = 120
+                };
+
+                TextBlock tbModel = new TextBlock()
+                {
+                    Text = history.Transport.Model,
+                    FontSize = 12,
+                    FontFamily = new FontFamily("Arial")
+                };
+
+                PackIcon packIcon = new PackIcon()
+                {
+                    Kind = PackIconKind.ContentCopy,
+                    Foreground = Brushes.Black
+                };
+
+                Button btnCopy = new Button()
+                {
+                    Height = 35,
+                    Width = 35,
+                    Padding = new Thickness(0),
+                    Background = Brushes.Transparent,
+                    BorderBrush = Brushes.Transparent,
+                    BorderThickness = new Thickness(0),
+                    ToolTip = "Скопировать VIN",
+                    Content = packIcon
+                };
+
+                string endDate = history.End != null ? history.End.Value.ToShortDateString() : "";
+
+                TextBlock tbDate = new TextBlock()
+                {
+                    Text = $"{history.Start.ToShortDateString()} > {endDate}",
+                    FontSize = 12,
+                    FontFamily = new FontFamily("Arial")
+                };
+
+                btnCopy.Click += (s, e) =>
+                {
+                    Clipboard.SetText(history.Transport.VIN);
+                };
+
+                Canvas.SetTop(tbGovNumber, 12);
+                Canvas.SetTop(tbModel, 40);
+                Canvas.SetRight(btnCopy, 5);
+                Canvas.SetTop(tbDate, 60);
+
+                canvas.Children.Add(tbGovNumber);
+                canvas.Children.Add(tbModel);
+                canvas.Children.Add(btnCopy);
+                canvas.Children.Add(tbDate);
+
+                lbitem.Content = canvas;
+
+                LBoxOwnerTransports.Items.Add(lbitem);
             }
         }
 
@@ -156,7 +323,41 @@ namespace GovTransportApp.Pages
                 }
             };
 
+            var histories = new List<OwnerHistoryDetailedDto>()
+            {
+                new OwnerHistoryDetailedDto()
+                {
+                    Transport = new Transport()
+                    {
+                        VIN = "4DRBWAFN06A207518",
+                        Model = "Toyota Camry",
+                        ReleaseYear = 2000,
+                        Color = "White",
+                        GovNumber = "А101МР56",
+                        Status = TransportStatus.Ok,
+                        BodyType = BodyType.Sedan
+                    },
+                    Start = new DateTime(2020, 3, 13),
+                    End = new DateTime(2022, 5, 1)
+                },
+                new OwnerHistoryDetailedDto()
+                {
+                    Transport = new Transport()
+                    {
+                        VIN = "JT2BF22K6Y0283641",
+                        Model = "Lexus IS250",
+                        ReleaseYear = 2007,
+                        Color = "Black",
+                        GovNumber = "М536МР56",
+                        Status = TransportStatus.Ok,
+                        BodyType = BodyType.Sedan
+                    },
+                    Start = new DateTime(2022, 6, 24)
+                }
+            };
+
             LoadOwnersToListBox(owners);
+            LoadOwnerTransportsToListBox(histories);
         }
     }
 }

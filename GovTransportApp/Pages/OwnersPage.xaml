@@ -26,6 +26,8 @@
 					Height="0.1*"/>
 				<RowDefinition
 					Height="*" />
+				<RowDefinition
+					Height="0.1*" />
 			</Grid.RowDefinitions>
 
 			<Grid>
@@ -33,7 +35,7 @@
 					<ColumnDefinition
 						Width="0.25*" />
 					<ColumnDefinition
-						Width="*"/>
+						Width="*" />
 				</Grid.ColumnDefinitions>
 
 				<materialDesign:PackIcon
@@ -76,6 +78,195 @@
 					Margin="0 20 0 0"/>
 				</Grid>
 			</Border>
+
+			<Button
+				x:Name="ButtonAddOwner"
+				Click="ButtonAddOwner_Click"
+				Grid.Row="2"
+				Background="ForestGreen"
+				BorderThickness="0"
+				materialDesign:ButtonAssist.CornerRadius="5"
+				Padding="0"
+				Margin="0"
+				VerticalAlignment="Bottom">
+				<StackPanel
+					Orientation="Horizontal">
+					<TextBlock
+						Text="Добавить"
+						VerticalAlignment="Center" />
+				</StackPanel>
+			</Button>
+		</Grid>
+
+		<Grid
+			x:Name="GridOwnerInfo"
+			Grid.Column="1"
+			Visibility="Hidden"
+			d:Visibility="Visible">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition
+					Width="*" />
+				<ColumnDefinition
+					Width="0.4*"/>
+			</Grid.ColumnDefinitions>
+
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition
+						Height="0.6*" />
+					<RowDefinition
+						Height="0.4*" />
+					<RowDefinition
+						Height="0.5*" />
+					<RowDefinition
+						Height="0.5*" />
+					<RowDefinition
+						Height="0.5*" />
+					<RowDefinition
+						Height="*" />
+				</Grid.RowDefinitions>
+
+				<Border 
+					BorderThickness="0 0 2 0"
+					BorderBrush="#3f51b5"
+					Grid.RowSpan="6"
+					Margin="0 0 6 0"/>
+
+				<Grid
+					Grid.Row="0"
+					Grid.RowSpan="2">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition
+							Width="0.3*" />
+						<ColumnDefinition
+							Width="*" />
+					</Grid.ColumnDefinitions>
+
+					<StackPanel Grid.Column="0">
+						<materialDesign:PackIcon
+							x:Name="IconOwnerType"
+							d:Kind="BriefCaseUser"
+							Width="80"
+							Height="80"
+							Margin="10 10 10 0"
+							HorizontalAlignment="Center" />
+
+						<Button
+							x:Name="ButtonEditOwner"
+							Click="ButtonEditOwner_Click"
+							Padding="0"
+							FontSize="10"
+							Foreground="Black"
+							Margin="10 0"
+							Height="30"
+							Background="Transparent"
+							BorderBrush="#3f51b5">
+							<materialDesign:PackIcon Kind="Edit"/>
+						</Button>
+					</StackPanel>
+
+					<TextBlock
+						x:Name="TBlockOwnerFullName"
+						Grid.Column="1"
+						FontSize="24"
+						VerticalAlignment="Top"
+						Margin="5 30 20 0"
+						FontWeight="SemiBold"
+						d:Text="Иванов Иван Иванович"
+						TextWrapping="Wrap" />
+				</Grid>
+
+				<StackPanel Grid.Row="2">
+					<TextBlock 
+						Text="Паспорт:"
+						FontSize="24"
+						FontWeight="SemiBold"
+						Margin="10 5 0 0"/>
+
+					<TextBlock 
+						x:Name="TBlockPassport"
+						d:Text="5431 234987"
+						FontSize="20"
+						Margin="10 5 0 0"/>
+				</StackPanel>
+
+				<StackPanel
+					Grid.Row="3">
+					<TextBlock
+						Text="Адрес регистрации:"
+						FontSize="24"
+						FontWeight="SemiBold"
+						Margin="10 5 0 0" />
+
+					<TextBlock
+						x:Name="TBlockAddress"
+						d:Text="Г.Орск, пр.Мира 1, кв 2"
+						FontSize="20"
+						Margin="10 5 0 0" />
+				</StackPanel>
+
+				<StackPanel
+					Grid.Row="4">
+					<TextBlock
+						Text="Осаго (при наличии):"
+						FontSize="24"
+						FontWeight="SemiBold"
+						Margin="10 5 0 0" />
+
+					<TextBlock
+						x:Name="TBlockOsago"
+						d:Text="78362487"
+						FontSize="20"
+						Margin="10 5 0 0" />
+				</StackPanel>
+			</Grid>
+
+			<Grid 
+				Grid.Column="1"
+				Margin="0 10">
+				<Grid.RowDefinitions>
+					<RowDefinition
+						Height="0.1*" />
+					<RowDefinition
+						Height="*"/>
+				</Grid.RowDefinitions>
+
+				<TextBlock 
+					Grid.Row="0"
+					Text="История владения ТС"
+					TextWrapping="Wrap"
+					FontWeight="SemiBold"
+					FontSize="16"
+					TextAlignment="Center"/>
+
+				<ListBox
+					x:Name="LBoxOwnerTransports"
+					Grid.Row="1">
+					<ListBox.ItemContainerStyle>
+						<Style
+							TargetType="ListBoxItem">
+							<Setter
+								Property="Focusable"
+								Value="False" />
+							<Setter
+								Property="IsHitTestVisible"
+								Value="False" />
+							<Setter
+								Property="Background"
+								Value="Transparent" />
+						</Style>
+					</ListBox.ItemContainerStyle>
+				</ListBox>
+
+				<TextBlock 
+					x:Name="TBlockOwnerTransportsEmpty"
+					Grid.Row="1"
+					Text="Отсутствует"
+					FontSize="16"
+					Margin="0 20 0 0"
+					HorizontalAlignment="Center"
+					Visibility="Hidden"/>
+			</Grid>
 		</Grid>
 	</Grid>
 </UserControl>

@@ -10,7 +10,7 @@
         public string Osago { get; set; } = string.Empty;
         public bool IsLegal { get; set; } = false;
 
-        public IEnumerable<OwnerHistory> TransportHistory { get; set; } = [];
+        public ICollection<OwnerHistory> TransportsHistory { get; set; } = new List<OwnerHistory>();
 
         public Ownership()
         {
