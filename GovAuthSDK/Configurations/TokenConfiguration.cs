@@ -12,6 +12,8 @@ namespace GovAuthSDK.Configurations
 
             builder.Property(x => x.AuthToken).HasColumnName("AuthToken");
             builder.Property(x => x.AccessLevel);
+
+            builder.HasData(new Token("ГосУслуги", new DateTime(2026, 5, 13)));
         }
     }
 }

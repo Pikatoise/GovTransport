@@ -17,7 +17,6 @@
 	ShowInTaskbar="True"
 	Background="#f4f6f9">
 	<Grid>
-
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition
 				Width="0.2*" />
@@ -25,13 +24,13 @@
 				Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<Border 
+		<Border
 			Grid.Column="0"
+			BorderThickness="0 0 4 0"
+			Margin="-6 6 0 6"
 			BorderBrush="#3f51b5"
-			BorderThickness="6"
-			Margin="-6 -6 0 -6">
-		</Border>
-		
+			Opacity="0.5" />
+
 		<Grid
 			Grid.Column="0"
 			Margin="6 0 12 0">
@@ -100,30 +99,30 @@
 						<RowDefinition
 							Height="*" />
 						<RowDefinition
-							Height="0.4*"/>
+							Height="0.4*" />
 					</Grid.RowDefinitions>
 
-					<materialDesign:PackIcon 
+					<materialDesign:PackIcon
 						x:Name="IconMain"
 						Kind="Home"
 						Width="50"
 						Height="50"
 						Foreground="Black"
 						VerticalAlignment="Center"
-						HorizontalAlignment="Center"/>
+						HorizontalAlignment="Center" />
 
 					<Border
 						x:Name="BorderMainText"
 						Background="Black"
 						Grid.Row="1">
-						<TextBlock 
+						<TextBlock
 							x:Name="TBlockMainText"
 							Text="Главная"
 							VerticalAlignment="Center"
 							HorizontalAlignment="Center"
 							FontSize="16"
 							FontWeight="SemiBold"
-							Foreground="#f4f6f9"/>
+							Foreground="#f4f6f9" />
 					</Border>
 				</Grid>
 			</Border>
@@ -288,17 +287,17 @@
 				</Grid>
 			</Border>
 
-			<StackPanel 
+			<StackPanel
 				Grid.Row="3"
 				Orientation="Horizontal"
 				VerticalAlignment="Center">
 				<materialDesign:PackIcon
-					Kind="User" 
+					Kind="User"
 					VerticalAlignment="Center"
 					Height="30"
-					Width="30"/>
+					Width="30" />
 
-				<TextBlock 
+				<TextBlock
 					x:Name="TBlockUsername"
 					d:Text="admin123"
 					TextWrapping="Wrap"
@@ -306,7 +305,7 @@
 					MaxWidth="130"
 					VerticalAlignment="Center"
 					FontSize="18"
-					FontWeight="SemiBold"/>
+					FontWeight="SemiBold" />
 			</StackPanel>
 
 			<Grid
@@ -368,16 +367,16 @@
 		<Border
 			Grid.Column="1"
 			Background="#f4f6f9">
-			<Image 
-				Source="/Resources/Img/bg.png" 
+			<Image
+				Source="/Resources/Img/bg.png"
 				Stretch="UniformToFill"
-				Opacity="0.5"/>
+				Opacity="0.5" />
 		</Border>
 
 		<ContentControl
 			x:Name="PageNavigator"
 			Grid.Column="1">
-			<pages:MainPage />
+			<pages:OwnersPage />
 		</ContentControl>
 	</Grid>
 </Window>

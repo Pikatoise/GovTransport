@@ -121,7 +121,7 @@ namespace GovTransportSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void AddOwnership(AddOwnershipDto dto)
+        public async Task AddOwnership(AddOwnershipDto dto)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -145,7 +145,7 @@ namespace GovTransportSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void UpdateOwnership(Ownership changedOwner)
+        public async Task UpdateOwnership(Ownership changedOwner)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -227,7 +227,7 @@ namespace GovTransportSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void AddTransport(AddTransportDto dto)
+        public async Task AddTransport(AddTransportDto dto)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -271,7 +271,7 @@ namespace GovTransportSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async void UpdateTransport(Transport changedTransport)
+        public async Task UpdateTransport(Transport changedTransport)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -336,6 +336,32 @@ namespace GovTransportSDK
             return lastOwner.Ownership;
         }
 
+        /// <summary>
+        /// High access level
+        /// </summary>
+        public async Task<string> UpdateTransportGovNumber(Guid transportId, string regionCode)
+        {
+            if (_accessLevel != AccessLevel.High)
+                throw new NoAccessException(AccessLevel.High.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transport = await context.Transports.FindAsync(transportId);
+
+            if (transport == null)
+                throw new TransportNotFoundException(transportId);
+
+            var newGovNumber = await GenerateUniqueGovNumber(regionCode);
+
+            transport.GovNumber = newGovNumber;
+
+            context.Transports.Update(transport);
+
+            await context.SaveChangesAsync();
+
+            return newGovNumber;
+        }
+
         private async Task<string> GenerateUniqueGovNumber(string regionCode)
         {
             using var context = new GovTransportContext();
@@ -360,7 +386,7 @@ namespace GovTransportSDK
         /// <summary>
         /// Required High level access
         /// </summary>
-        public async void TransportOwnerRegistration(Guid ownerId, Guid transportId)
+        public async Task TransportOwnerRegistration(Guid ownerId, Guid transportId)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());

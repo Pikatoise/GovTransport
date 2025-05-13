@@ -2,7 +2,7 @@
 {
     public class Ownership
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public string FullName { get; set; }
         public string RegistrationAddress { get; set; }
         public string Passport { get; set; }

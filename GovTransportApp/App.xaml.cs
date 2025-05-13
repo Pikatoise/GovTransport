@@ -4,9 +4,6 @@ using System.Windows;
 
 namespace GovTransportApp
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App: Application
     {
         public GovAuthService? AuthService { get; set; }
