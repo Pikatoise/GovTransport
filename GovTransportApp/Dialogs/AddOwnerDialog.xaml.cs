@@ -20,6 +20,8 @@ namespace GovTransportApp.Dialogs
             InitializeComponent();
 
             this._ownership = ownership;
+
+            ButtonSave.Content = "Изменить";
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -73,7 +75,7 @@ namespace GovTransportApp.Dialogs
                 return;
             }
 
-            var ownerWithSamePassport = await ((App)Application.Current).TransportService.OwnerByPassport(passport);
+            Ownership? ownerWithSamePassport = await ((App)Application.Current).TransportService.OwnerByPassport(passport);
 
             if (ownerWithSamePassport != null)
             {
@@ -94,6 +96,8 @@ namespace GovTransportApp.Dialogs
                 TBoxRegistration.IsEnabled = true;
 
                 CBoxIsLegal.IsEnabled = true;
+
+                MessageBox.Show("Владелец с таким паспортом еще не зарегистрирован!", "Успех", MessageBoxButton.OK);
             }
         }
 

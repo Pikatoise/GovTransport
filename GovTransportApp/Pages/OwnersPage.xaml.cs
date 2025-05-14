@@ -180,7 +180,7 @@ namespace GovTransportApp.Pages
             {
                 ListBoxItem lbitem = new ListBoxItem() { Tag = owner };
 
-                Canvas canvas = new Canvas() { Height = 50 };
+                Canvas canvas = new Canvas() { Height = 60 };
 
                 PackIcon icon = new PackIcon()
                 {
@@ -201,8 +201,10 @@ namespace GovTransportApp.Pages
 
                 TextBlock tbFullName = new TextBlock()
                 {
+                    Width = 150,
                     Text = owner.FullName,
                     FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
                     FontFamily = new FontFamily("Arial")
                 };
 
@@ -315,7 +317,7 @@ namespace GovTransportApp.Pages
                 },
                 new Ownership()
                 {
-                    FullName = "Сидорова Ольга Ивановна",
+                    FullName = "Сидоровафцвфцв Ольга Ивановна",
                     IsLegal = true,
                     Osago = "84726872393",
                     Passport = "4211 407441",
@@ -345,8 +347,8 @@ namespace GovTransportApp.Pages
                     Transport = new Transport()
                     {
                         VIN = "JT2BF22K6Y0283641",
-                        Model = "Lexus IS250",
-                        ReleaseYear = 2007,
+                        Model = "Hyundai Tucson",
+                        ReleaseYear = 2019,
                         Color = "Black",
                         GovNumber = "М536МР56",
                         Status = TransportStatus.Ok,

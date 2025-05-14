@@ -38,8 +38,8 @@ namespace GovTransportSDK.Configurations
                 {
                     Id = Guid.Parse("f36763c9-0b0b-48d1-9562-2be3e7bffcae"),
                     VIN = "JT2BF22K6Y0283641",
-                    Model = "Lexus IS250",
-                    ReleaseYear = 2007,
+                    Model = "Hyundai Tucson",
+                    ReleaseYear = 2019,
                     Color = "Black",
                     GovNumber = "М536МР56",
                     Status = TransportStatus.Ok,

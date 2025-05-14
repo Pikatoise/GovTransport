@@ -103,7 +103,7 @@ namespace GovTransportSDK
         /// <summary>
         /// Medium access level
         /// </summary>
-        public async Task<Ownership> OwnerByPassport(string passport)
+        public async Task<Ownership?> OwnerByPassport(string passport)
         {
             if (_accessLevel == AccessLevel.Low)
                 throw new NoAccessException(AccessLevel.Medium.ToString());
@@ -111,9 +111,6 @@ namespace GovTransportSDK
             using var context = new GovTransportContext();
 
             var ownerDb = await context.Owners.SingleOrDefaultAsync(x => EF.Functions.Like(x.Passport, $"{passport}"));
-
-            if (ownerDb == null)
-                throw new OwnerNotFoundException(passport);
 
             return ownerDb;
         }
@@ -175,7 +172,13 @@ namespace GovTransportSDK
             if (ownerWithSameId == null)
                 throw new OwnerNotFoundException(changedOwner.Id);
 
-            context.Owners.Update(changedOwner);
+            ownerWithSameId.FullName = changedOwner.FullName;
+            ownerWithSameId.RegistrationAddress = changedOwner.RegistrationAddress;
+            ownerWithSameId.Passport = changedOwner.Passport;
+            ownerWithSameId.Osago = changedOwner.Osago;
+            ownerWithSameId.IsLegal = changedOwner.IsLegal;
+
+            context.Owners.Update(ownerWithSameId);
 
             await context.SaveChangesAsync();
         }
@@ -258,13 +261,28 @@ namespace GovTransportSDK
             if (transportWithSameVin != null)
                 throw new TransportWithSameVinExistsException(dto.VIN);
 
-            string govNumber = await GenerateUniqueGovNumber(dto.RegionCode);
-
-            Transport newTransport = new Transport(dto.VIN, dto.Model, dto.ReleaseYear, dto.Color, govNumber, dto.Status, dto.BodyType);
+            Transport newTransport = new Transport(dto.VIN, dto.Model, dto.ReleaseYear, dto.Color, dto.GovNumber, dto.Status, dto.BodyType);
 
             await context.Transports.AddAsync(newTransport);
 
             await context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<Transport?> FindTransportByVIN(string vin)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportDb = await context.Transports
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => EF.Functions.Like(x.VIN, $"{vin}"));
+
+            return transportDb;
         }
 
         /// <summary>
@@ -286,6 +304,24 @@ namespace GovTransportSDK
         }
 
         /// <summary>
+        /// Medium access level
+        /// </summary>
+        public async Task<IEnumerable<Transport>> FindTransportsByGovNumber(string govNumber)
+        {
+            if (_accessLevel == AccessLevel.Low)
+                throw new NoAccessException(AccessLevel.Medium.ToString());
+
+            using var context = new GovTransportContext();
+
+            var transportsDb = await context.Transports
+                .AsNoTracking()
+                .Where(x => EF.Functions.Like(x.GovNumber, $"%{govNumber}%"))
+                .ToListAsync();
+
+            return transportsDb;
+        }
+
+        /// <summary>
         /// High access level
         /// </summary>
         public async Task UpdateTransport(Transport changedTransport)
@@ -300,7 +336,15 @@ namespace GovTransportSDK
             if (transportWithSameID == null)
                 throw new TransportNotFoundException(changedTransport.Id);
 
-            context.Transports.Update(changedTransport);
+            transportWithSameID.VIN = changedTransport.VIN;
+            transportWithSameID.Model = changedTransport.Model;
+            transportWithSameID.ReleaseYear = changedTransport.ReleaseYear;
+            transportWithSameID.Color = changedTransport.Color;
+            transportWithSameID.GovNumber = changedTransport.GovNumber;
+            transportWithSameID.Status = changedTransport.Status;
+            transportWithSameID.BodyType = changedTransport.BodyType;
+
+            context.Transports.Update(transportWithSameID);
 
             await context.SaveChangesAsync();
         }
@@ -333,7 +377,7 @@ namespace GovTransportSDK
         /// <summary>
         /// Medium access level
         /// </summary>
-        public async Task<Ownership> LastOwnerByTransportId(Guid transportId)
+        public async Task<OwnerHistory?> LastOwnerByTransportId(Guid transportId)
         {
             if (_accessLevel == AccessLevel.Low)
                 throw new NoAccessException(AccessLevel.Medium.ToString());
@@ -348,9 +392,10 @@ namespace GovTransportSDK
             var lastOwner = await context.OwnerHistories
                 .AsNoTracking()
                 .Include(x => x.Ownership)
-                .LastAsync(x => x.TransportId == transportId);
+                .OrderBy(x => x.Start)
+                .LastOrDefaultAsync(x => x.TransportId == transportId);
 
-            return lastOwner.Ownership;
+            return lastOwner;
         }
 
         /// <summary>
@@ -379,7 +424,10 @@ namespace GovTransportSDK
             return newGovNumber;
         }
 
-        private async Task<string> GenerateUniqueGovNumber(string regionCode)
+        /// <summary>
+        /// High access level
+        /// </summary>
+        public async Task<string> GenerateUniqueGovNumber(string regionCode)
         {
             using var context = new GovTransportContext();
 

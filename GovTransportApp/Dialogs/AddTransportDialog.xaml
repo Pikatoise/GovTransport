@@ -1,0 +1,198 @@
+﻿<Window 
+	x:Class="GovTransportApp.Dialogs.AddTransportDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:local="clr-namespace:GovTransportApp.Dialogs"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	mc:Ignorable="d"
+	Title="Транспорт"
+	Height="550"
+	Width="450"
+	WindowStartupLocation="CenterScreen"
+	WindowStyle="SingleBorderWindow"
+	ResizeMode="CanMinimize"
+	Background="#f4f6f9"
+	Loaded="Window_Loaded">
+	<Grid
+		Margin="20">
+		<StackPanel>
+			<StackPanel
+				Orientation="Horizontal"
+				Margin="0 0 0 10">
+				<TextBox
+					x:Name="TBoxVin"
+					TextChanged="TBoxVin_TextChanged"
+					Height="45"
+					Width="270"
+					Padding="10 0"
+					BorderBrush="#3f51b5"
+					BorderThickness="2"
+					FontSize="16"
+					HorizontalAlignment="Stretch"
+					materialDesign:HintAssist.Hint="VIN" />
+
+				<Button
+					x:Name="ButtonCheckVin"
+					Content="Проверить"
+					Click="ButtonCheckVin_Click"
+					FontSize="14"
+					Height="40"
+					Background="Transparent"
+					Foreground="Black"
+					FontWeight="SemiBold"
+					BorderBrush="#3f51b5"
+					BorderThickness="2"
+					Margin="10 0 0 0"
+					materialDesign:ButtonAssist.CornerRadius="5"
+					VerticalAlignment="Center" />
+			</StackPanel>
+
+			<TextBox
+				x:Name="TBoxModel"
+				Height="45"
+				Margin="0 0 0 10"
+				Padding="10 0"
+				BorderBrush="#3f51b5"
+				BorderThickness="2"
+				FontSize="16"
+				IsEnabled="False"
+				HorizontalAlignment="Stretch"
+				materialDesign:HintAssist.Hint="Модель" />
+
+			<ComboBox
+				x:Name="CBoxBodyType"
+				Height="45"
+				Margin="0 0 0 10"
+				Padding="10 0"
+				BorderBrush="#3f51b5"
+				BorderThickness="2"
+				IsEnabled="False"
+				FontSize="16"
+				HorizontalAlignment="Stretch"
+				materialDesign:HintAssist.Hint="Кузов">
+				<ComboBoxItem
+					Content="Convertible"
+					IsSelected="True"/>
+				<ComboBoxItem
+					Content="Coupe" />
+				<ComboBoxItem
+					Content="Crossover" />
+				<ComboBoxItem
+					Content="Estate" />
+				<ComboBoxItem
+					Content="Hatchback" />
+				<ComboBoxItem
+					Content="Limousine" />
+				<ComboBoxItem
+					Content="Truck" />
+				<ComboBoxItem
+					Content="Minivan" />
+				<ComboBoxItem
+					Content="Pickup" />
+				<ComboBoxItem
+					Content="Roadster" />
+				<ComboBoxItem
+					Content="Sedan" />
+				<ComboBoxItem
+					Content="SUV" />
+				<ComboBoxItem
+					Content="Van" />
+			</ComboBox>
+
+			<TextBox
+				x:Name="TBoxColor"
+				Height="45"
+				Margin="0 0 0 10"
+				Padding="10 0"
+				BorderBrush="#3f51b5"
+				BorderThickness="2"
+				IsEnabled="False"
+				FontSize="16"
+				HorizontalAlignment="Stretch"
+				materialDesign:HintAssist.Hint="Цвет" />
+
+			<TextBox
+				x:Name="TBoxReleaseYear"
+				Height="45"
+				Margin="0 0 0 10"
+				Padding="10 0"
+				BorderBrush="#3f51b5"
+				BorderThickness="2"
+				IsEnabled="False"
+				FontSize="16"
+				HorizontalAlignment="Stretch"
+				materialDesign:HintAssist.Hint="Год выпуска" />
+
+			<ComboBox
+				x:Name="CBoxStatus"
+				Height="45"
+				Margin="0 0 0 10"
+				Padding="10 0"
+				BorderBrush="#3f51b5"
+				BorderThickness="2"
+				IsEnabled="False"
+				FontSize="16"
+				HorizontalAlignment="Stretch"
+				materialDesign:HintAssist.Hint="Статус">
+				<ComboBoxItem
+					Content="Unknown"
+					IsSelected="True" />
+				<ComboBoxItem
+					Content="Utilize" />
+				<ComboBoxItem
+					Content="Wanted" />
+				<ComboBoxItem
+					Content="Ok"/>
+			</ComboBox>
+
+			<StackPanel
+				Orientation="Horizontal"
+				Margin="0 0 0 10">
+				<TextBox
+					x:Name="TBoxGovNumber"
+					Height="45"
+					Width="270"
+					Padding="10 0"
+					BorderBrush="#3f51b5"
+					BorderThickness="2"
+					FontSize="16"
+					IsEnabled="False"
+					HorizontalAlignment="Stretch"
+					materialDesign:HintAssist.Hint="Номер" />
+
+				<Button
+					x:Name="ButtonGetGovNumber"
+					Content="Получить"
+					Click="ButtonGetGovNumber_Click"
+					FontSize="14"
+					Height="40"
+					IsEnabled="False"
+					Background="Transparent"
+					Foreground="Black"
+					FontWeight="SemiBold"
+					BorderBrush="#3f51b5"
+					BorderThickness="2"
+					Margin="15 0 0 0"
+					materialDesign:ButtonAssist.CornerRadius="5"
+					VerticalAlignment="Center" />
+			</StackPanel>
+		</StackPanel>
+
+		<Button
+			x:Name="ButtonSave"
+			Content="Добавить"
+			Click="ButtonSave_Click"
+			FontSize="16"
+			Height="45"
+			HorizontalAlignment="Stretch"
+			Background="#3f51b5"
+			Foreground="White"
+			FontWeight="SemiBold"
+			BorderBrush="#3f51b5"
+			BorderThickness="2"
+			materialDesign:ButtonAssist.CornerRadius="5"
+			VerticalAlignment="Bottom" />
+	</Grid>
+</Window>

@@ -9,7 +9,7 @@ namespace GovTransportSDK.DTO
         public int ReleaseYear { get; set; }
         public string Color { get; set; }
 
-        public string RegionCode { get; set; }
+        public string GovNumber { get; set; }
 
         public TransportStatus Status { get; set; }
         public BodyType BodyType { get; set; }

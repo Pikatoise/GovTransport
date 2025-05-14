@@ -93,6 +93,7 @@
 		</StackPanel>
 
 		<Button
+			x:Name="ButtonSave"
 			Content="Добавить"
 			Click="Button_Click"
 			FontSize="16"
