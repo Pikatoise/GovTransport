@@ -241,22 +241,7 @@
 
 				<ListBox
 					x:Name="LBoxOwnerTransports"
-					Grid.Row="1">
-					<ListBox.ItemContainerStyle>
-						<Style
-							TargetType="ListBoxItem">
-							<Setter
-								Property="Focusable"
-								Value="False" />
-							<Setter
-								Property="IsHitTestVisible"
-								Value="False" />
-							<Setter
-								Property="Background"
-								Value="Transparent" />
-						</Style>
-					</ListBox.ItemContainerStyle>
-				</ListBox>
+					Grid.Row="1" />
 
 				<TextBlock 
 					x:Name="TBlockOwnerTransportsEmpty"

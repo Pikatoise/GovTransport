@@ -14,7 +14,8 @@ namespace GovTransportSDK.Extensions
                 ReleaseYear = transport.ReleaseYear,
                 Color = transport.Color,
                 GovNumber = transport.GovNumber,
-                Status = transport.Status
+                Status = transport.Status,
+                BodyType = transport.BodyType
             };
         }
     }

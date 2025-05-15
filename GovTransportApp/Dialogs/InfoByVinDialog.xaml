@@ -1,0 +1,205 @@
+﻿<Window 
+	x:Class="GovTransportApp.Dialogs.InfoByVinDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:local="clr-namespace:GovTransportApp.Dialogs"
+	xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+	mc:Ignorable="d"
+	Title="Транспорт"
+	Height="600"
+	Width="800"
+	WindowStartupLocation="CenterScreen"
+	WindowStyle="SingleBorderWindow"
+	ResizeMode="CanMinimize"
+	Background="#f4f6f9"
+	Loaded="Window_Loaded">
+	<Grid Margin="10 0 0 0">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition
+				Width="*" />
+			<ColumnDefinition
+				Width="0.4*" />
+		</Grid.ColumnDefinitions>
+
+		<Border
+			Grid.ColumnSpan="2"
+			Background="#f4f6f9">
+			<Image
+				Source="/Resources/Img/bg.png"
+				Stretch="UniformToFill"
+				Opacity="0.5" />
+		</Border>
+
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="0.5*" />
+				<RowDefinition
+					Height="0.4*" />
+				<RowDefinition
+					Height="0.4*" />
+				<RowDefinition
+					Height="0.4*" />
+				<RowDefinition
+					Height="0.4*" />
+				<RowDefinition
+					Height="0.4*" />
+				<RowDefinition
+					Height="0.4*" />
+				<RowDefinition
+					Height="0.4*" />
+			</Grid.RowDefinitions>
+
+			<Border
+				BorderThickness="0 0 2 0"
+				BorderBrush="#3f51b5"
+				Grid.RowSpan="8"
+				Margin="0 10 6 10" />
+
+			<Grid
+				Grid.Row="0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition
+						Width="*" />
+					<ColumnDefinition
+						Width="0.3*" />
+				</Grid.ColumnDefinitions>
+
+				<TextBlock
+					x:Name="TBlockTransportGovNumber"
+					Grid.Column="0"
+					FontSize="24"
+					VerticalAlignment="Center"
+					Margin="10 0 20 0"
+					FontWeight="SemiBold"
+					d:Text="О111ОО56"
+					TextWrapping="Wrap" />
+			</Grid>
+
+			<StackPanel
+				Grid.Row="1">
+				<TextBlock
+					Text="VIN:"
+					FontSize="24"
+					FontWeight="SemiBold"
+					Margin="10 5 0 0" />
+
+				<TextBlock
+					x:Name="TBlockVin"
+					d:Text="4DRBWAFN06A207518"
+					FontSize="20"
+					Margin="10 5 0 0" />
+			</StackPanel>
+
+			<StackPanel
+				Grid.Row="2">
+				<TextBlock
+					Text="Модель:"
+					FontSize="24"
+					FontWeight="SemiBold"
+					Margin="10 5 0 0" />
+
+				<TextBlock
+					x:Name="TBlockModel"
+					d:Text="Toyota Camry"
+					FontSize="20"
+					Margin="10 5 0 0" />
+			</StackPanel>
+
+			<StackPanel
+				Grid.Row="3">
+				<TextBlock
+					Text="Кузов:"
+					FontSize="24"
+					FontWeight="SemiBold"
+					Margin="10 5 0 0" />
+
+				<TextBlock
+					x:Name="TBlockBodyType"
+					d:Text="Sedan"
+					FontSize="20"
+					Margin="10 5 0 0" />
+			</StackPanel>
+
+			<StackPanel
+				Grid.Row="4">
+				<TextBlock
+					Text="Цвет:"
+					FontSize="24"
+					FontWeight="SemiBold"
+					Margin="10 5 0 0" />
+
+				<TextBlock
+					x:Name="TBlockColor"
+					d:Text="Белый"
+					FontSize="20"
+					Margin="10 5 0 0" />
+			</StackPanel>
+
+			<StackPanel
+				Grid.Row="5">
+				<TextBlock
+					Text="Год выпуска:"
+					FontSize="24"
+					FontWeight="SemiBold"
+					Margin="10 5 0 0" />
+
+				<TextBlock
+					x:Name="TBlockReleaseYear"
+					d:Text="2000"
+					FontSize="20"
+					Margin="10 5 0 0" />
+			</StackPanel>
+
+			<StackPanel
+				Grid.Row="6">
+				<TextBlock
+					Text="Статус:"
+					FontSize="24"
+					FontWeight="SemiBold"
+					Margin="10 5 0 0" />
+
+				<TextBlock
+					x:Name="TBlockStatus"
+					d:Text="Ok"
+					FontSize="20"
+					Margin="10 5 0 0" />
+			</StackPanel>
+		</Grid>
+
+		<Grid
+			Grid.Column="1"
+			Margin="0 10">
+			<Grid.RowDefinitions>
+				<RowDefinition
+					Height="0.1*" />
+				<RowDefinition
+					Height="*" />
+			</Grid.RowDefinitions>
+
+			<TextBlock
+				Grid.Row="0"
+				Text="История владельцев"
+				TextWrapping="Wrap"
+				FontWeight="SemiBold"
+				VerticalAlignment="Center"
+				FontSize="16"
+				TextAlignment="Center" />
+
+			<ListBox 
+				x:Name="LBoxOwnersHistory"
+				Grid.Row="1"/>
+
+			<TextBlock
+				x:Name="TBlockTransportOwnersEmpty"
+				Grid.Row="1"
+				Text="Отсутствует..."
+				FontSize="16"
+				Margin="0 20 0 0"
+				HorizontalAlignment="Center"
+				Visibility="Hidden" />
+		</Grid>
+	</Grid>
+</Window>

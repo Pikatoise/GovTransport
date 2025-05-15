@@ -6,6 +6,7 @@ using MaterialDesignThemes.Wpf;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -226,9 +227,13 @@ namespace GovTransportApp.Pages
         {
             foreach (var history in histories)
             {
-                ListBoxItem lbitem = new ListBoxItem();
+                ListBoxItem lbitem = new ListBoxItem()
+                {
+                    BorderBrush = (Brush)new BrushConverter().ConvertFromString("#3f51b5"),
+                    BorderThickness = new Thickness(0, 0, 0, 2)
+                };
 
-                Canvas canvas = new Canvas() { Height = 70 };
+                Canvas canvas = new Canvas() { Height = 75 };
 
                 TextBlock tbGovNumber = new TextBlock()
                 {
@@ -237,7 +242,7 @@ namespace GovTransportApp.Pages
                     FontWeight = FontWeights.SemiBold,
                     TextWrapping = TextWrapping.Wrap,
                     FontFamily = new FontFamily("Arial"),
-                    Width = 120
+                    Width = 100
                 };
 
                 TextBlock tbModel = new TextBlock()
@@ -250,7 +255,11 @@ namespace GovTransportApp.Pages
                 PackIcon packIcon = new PackIcon()
                 {
                     Kind = PackIconKind.ContentCopy,
-                    Foreground = Brushes.Black
+                    Foreground = Brushes.Black,
+                    Width = 25,
+                    Height = 25,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
 
                 Button btnCopy = new Button()
@@ -259,10 +268,11 @@ namespace GovTransportApp.Pages
                     Width = 35,
                     Padding = new Thickness(0),
                     Background = Brushes.Transparent,
-                    BorderBrush = Brushes.Transparent,
-                    BorderThickness = new Thickness(0),
+                    BorderBrush = (Brush)new BrushConverter().ConvertFromString("#3f51b5"),
+                    BorderThickness = new Thickness(2),
                     ToolTip = "Скопировать VIN",
-                    Content = packIcon
+                    Content = packIcon,
+                    Cursor = Cursors.Hand
                 };
 
                 string endDate = history.End != null ? history.End.Value.ToShortDateString() : "";
@@ -280,9 +290,15 @@ namespace GovTransportApp.Pages
                 };
 
                 Canvas.SetTop(tbGovNumber, 12);
+
                 Canvas.SetTop(tbModel, 40);
-                Canvas.SetRight(btnCopy, 5);
+
+                Canvas.SetTop(btnCopy, 8);
+                Canvas.SetLeft(btnCopy, 120);
+
                 Canvas.SetTop(tbDate, 60);
+
+                Panel.SetZIndex(btnCopy, 1);
 
                 canvas.Children.Add(tbGovNumber);
                 canvas.Children.Add(tbModel);
