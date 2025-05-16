@@ -11,6 +11,7 @@ namespace GovTransportApp.Dialogs
         public bool IsFinished = false;
         private bool isVinOk = false;
         private Transport? _transport = null;
+        public Guid? NewTransportId;
 
         public AddTransportDialog()
         {
@@ -201,7 +202,8 @@ namespace GovTransportApp.Dialogs
                 await ((App)Application.Current).TransportService.UpdateTransport(_transport);
             }
             else
-                await ((App)Application.Current).TransportService.AddTransport(new AddTransportDto()
+            {
+                NewTransportId = await ((App)Application.Current).TransportService.AddTransport(new AddTransportDto()
                 {
                     VIN = vin,
                     Model = model,
@@ -211,6 +213,7 @@ namespace GovTransportApp.Dialogs
                     Status = status,
                     GovNumber = govNumber
                 });
+            }
 
             IsFinished = true;
 

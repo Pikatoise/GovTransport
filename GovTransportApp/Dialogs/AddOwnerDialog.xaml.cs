@@ -9,6 +9,7 @@ namespace GovTransportApp.Dialogs
         public bool IsFinished = false;
         private bool isPassportOk = false;
         private Ownership? _ownership = null;
+        public Guid? NewOwnershipId;
 
         public AddOwnerDialog()
         {
@@ -154,7 +155,8 @@ namespace GovTransportApp.Dialogs
                 await ((App)Application.Current).TransportService.UpdateOwnership(_ownership);
             }
             else
-                await ((App)Application.Current).TransportService.AddOwnership(new AddOwnershipDto()
+            {
+                NewOwnershipId = await ((App)Application.Current).TransportService.AddOwnership(new AddOwnershipDto()
                 {
                     Passport = passport,
                     FullName = fullName,
@@ -162,6 +164,7 @@ namespace GovTransportApp.Dialogs
                     Osago = osago,
                     IsLegal = isLegal
                 });
+            }
 
             IsFinished = true;
 

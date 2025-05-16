@@ -136,7 +136,7 @@ namespace GovTransportSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async Task AddOwnership(AddOwnershipDto dto)
+        public async Task<Guid> AddOwnership(AddOwnershipDto dto)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -155,6 +155,8 @@ namespace GovTransportSDK
             await context.Owners.AddAsync(newOwnership);
 
             await context.SaveChangesAsync();
+
+            return newOwnership.Id;
         }
 
         /// <summary>
@@ -247,7 +249,7 @@ namespace GovTransportSDK
         /// <summary>
         /// High access level
         /// </summary>
-        public async Task AddTransport(AddTransportDto dto)
+        public async Task<Guid> AddTransport(AddTransportDto dto)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -266,6 +268,8 @@ namespace GovTransportSDK
             await context.Transports.AddAsync(newTransport);
 
             await context.SaveChangesAsync();
+
+            return newTransport.Id;
         }
 
         /// <summary>
@@ -466,7 +470,11 @@ namespace GovTransportSDK
             if (transport == null)
                 throw new TransportNotFoundException(transportId);
 
-            var lastOwnerHistory = await context.OwnerHistories.AsNoTracking().LastOrDefaultAsync(x => x.TransportId == transportId);
+            var lastOwnerHistory = await context.OwnerHistories
+                .AsNoTracking()
+                .OrderBy(x => x.Start)
+                .LastOrDefaultAsync(x => x.TransportId == transportId);
+
             if (lastOwnerHistory != null && lastOwnerHistory.End == null)
             {
                 lastOwnerHistory.End = DateTime.UtcNow;

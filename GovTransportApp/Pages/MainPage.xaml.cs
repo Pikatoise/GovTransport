@@ -12,7 +12,9 @@ namespace GovTransportApp.Pages
 
         private void ButtonMakeOwnership_Click(object sender, System.Windows.RoutedEventArgs e)
         {
+            var uchetDialog = new UchetDialog();
 
+            uchetDialog.ShowDialog();
         }
 
         private void ButtonVinSearch_Click(object sender, System.Windows.RoutedEventArgs e)

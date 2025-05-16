@@ -376,7 +376,7 @@
 		<ContentControl
 			x:Name="PageNavigator"
 			Grid.Column="1">
-			<pages:OwnersPage />
+			<pages:MainPage />
 		</ContentControl>
 	</Grid>
 </Window>
