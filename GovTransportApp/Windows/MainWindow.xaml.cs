@@ -40,7 +40,7 @@ namespace GovTransportApp.Windows
 
         private async void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
-            ChangePage(new SettingsPage());
+            ChangePage(new SettingsPage(_user));
         }
 
         private void ButtonLeave_Click(object sender, RoutedEventArgs e)

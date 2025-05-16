@@ -98,6 +98,15 @@ namespace GovTransportApp.Dialogs
                 return;
             }
 
+            var lastOwner = await ((App)Application.Current).TransportService.LastOwnerByTransportId((Guid)_transportId);
+
+            if (lastOwner != null && lastOwner.End == null && lastOwner.Ownership.Id == _ownerId)
+            {
+                MessageBox.Show("Транспорт уже стоит на учете у данного владельца!", "Ошибка");
+
+                return;
+            }
+
             await ((App)Application.Current).TransportService.TransportOwnerRegistration((Guid)_ownerId, (Guid)_transportId);
 
             MessageBox.Show("Успешно");

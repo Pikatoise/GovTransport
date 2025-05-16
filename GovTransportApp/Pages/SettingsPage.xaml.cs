@@ -9,10 +9,13 @@ namespace GovTransportApp.Pages
     public partial class SettingsPage: UserControl
     {
         GovAuthService _authService;
+        UserDto _currentUser;
 
-        public SettingsPage()
+        public SettingsPage(UserDto user)
         {
             InitializeComponent();
+
+            _currentUser = user;
 
             _authService = ((App)Application.Current).AuthService!;
         }
@@ -46,6 +49,18 @@ namespace GovTransportApp.Pages
             if (selectedItem == null)
             {
                 MessageBox.Show("Выберите пользователя!");
+                return;
+            }
+
+            if (selectedItem.Login.Equals(_currentUser.Login))
+            {
+                MessageBox.Show("Вы не можете удалить свой профиль!");
+                return;
+            }
+
+            if (selectedItem.Login.Equals("admin"))
+            {
+                MessageBox.Show("Вы не можете удалить администратора!");
                 return;
             }
 

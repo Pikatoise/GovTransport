@@ -45,14 +45,14 @@ namespace GovTransportSDK
         /// <summary>
         /// Low access level
         /// </summary>
-        public async Task<VinInfoDto> InfoByVin(string vin)
+        public async Task<VinInfoDto?> InfoByVin(string vin)
         {
             using var context = new GovTransportContext();
 
             var transportDb = await context.Transports.FirstOrDefaultAsync(x => x.VIN == vin);
 
             if (transportDb == null)
-                throw new TransportNotFoundException(vin);
+                return null;
 
             var historiesDb = await context.OwnerHistories
                 .AsNoTracking()
