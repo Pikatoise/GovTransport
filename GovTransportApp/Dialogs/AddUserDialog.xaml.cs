@@ -1,7 +1,5 @@
-﻿using GovAuthSDK.Enums;
-using GovAuthSDK.Exceptions;
+﻿using GovAuthSDK.Exceptions;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace GovTransportApp.Dialogs
 {
@@ -18,7 +16,6 @@ namespace GovTransportApp.Dialogs
         {
             string login = TBoxLogin.Text.Trim();
             string password = TBoxPassword.Password.Trim();
-            var accessLevel = (AccessLevel)int.Parse((string)((ComboBoxItem)CBoxAccessLevel.SelectedItem).Tag);
 
             if (string.IsNullOrEmpty(login))
             {
@@ -36,7 +33,7 @@ namespace GovTransportApp.Dialogs
 
             try
             {
-                await ((App)Application.Current).AuthService!.AddUser(login, password, accessLevel);
+                await ((App)Application.Current).AuthService!.AddUser(login, password);
             }
             catch (Exception ex)
             {

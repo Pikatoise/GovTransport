@@ -17,12 +17,12 @@ namespace GovAuthSDK.Models
 
         }
 
-        public User(string login, string passwordHashed, AccessLevel accessLevel)
+        public User(string login, string passwordHashed)
         {
             Id = Guid.NewGuid();
+            AccessLevel = AccessLevel.High;
             Login = login;
             PasswordHashed = passwordHashed;
-            AccessLevel = accessLevel;
         }
     }
 }

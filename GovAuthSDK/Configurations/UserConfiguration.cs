@@ -1,5 +1,4 @@
-﻿using GovAuthSDK.Enums;
-using GovAuthSDK.Helpers;
+﻿using GovAuthSDK.Helpers;
 using GovAuthSDK.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -16,7 +15,7 @@ namespace GovAuthSDK.Configurations
             builder.Property(x => x.PasswordHashed).HasColumnName("Password");
             builder.Property(x => x.AccessLevel);
 
-            builder.HasData(new User("admin", HashHelper.HashPassword("admin"), AccessLevel.High));
+            builder.HasData(new User("admin", HashHelper.HashPassword("admin")));
         }
     }
 }

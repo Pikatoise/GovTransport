@@ -5,18 +5,23 @@ using GovAuthSDK.Extensions;
 using GovAuthSDK.Helpers;
 using GovAuthSDK.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovAuthSDK
 {
     public sealed class GovAuthService
     {
+        private readonly ILogger<GovAuthService> _logger;
         private AccessLevel _accessLevel = AccessLevel.Low;
+        private string? _identity;
 
-        public GovAuthService()
+        public GovAuthService(ILogger<GovAuthService> logger)
         {
             using var context = new GovAuthContext();
             context.Database.EnsureCreatedAsync();
             context.Users.FirstOrDefault();
+
+            _logger = logger;
         }
 
         public async Task<TokenDto> TokenAuth(string token)
@@ -32,6 +37,9 @@ namespace GovAuthSDK
                 throw new InvalidTokenException(token);
 
             _accessLevel = dbToken.AccessLevel;
+            _identity = dbToken.AuthToken;
+
+            LogMethodExecution("TokenAuth");
 
             return dbToken.ToDto();
         }
@@ -49,6 +57,9 @@ namespace GovAuthSDK
                 throw new WrongPasswordException(null);
 
             _accessLevel = dbUser.AccessLevel;
+            _identity = dbUser.Login;
+
+            LogMethodExecution("LoginAuth");
 
             return dbUser.ToDto();
         }
@@ -65,13 +76,15 @@ namespace GovAuthSDK
 
             var dbUsers = await context.Users.AsNoTracking().ToListAsync();
 
+            LogMethodExecution("AllUsers");
+
             return dbUsers.Select(x => x.ToDto());
         }
 
         /// <summary>
         /// High access level
         /// </summary>
-        public async Task AddUser(string login, string password, AccessLevel accessLevel)
+        public async Task AddUser(string login, string password)
         {
             if (_accessLevel != AccessLevel.High)
                 throw new NoAccessException(AccessLevel.High.ToString());
@@ -83,9 +96,11 @@ namespace GovAuthSDK
             if (isExistUserWithSameLogin)
                 throw new ExistUserWithSameLoginException(login);
 
-            var newUser = new User(login, HashHelper.HashPassword(password), accessLevel);
+            var newUser = new User(login, HashHelper.HashPassword(password));
 
             await context.Users.AddAsync(newUser);
+
+            LogMethodExecution("AddUser");
 
             await context.SaveChangesAsync();
         }
@@ -107,6 +122,8 @@ namespace GovAuthSDK
 
             context.Remove(user);
 
+            LogMethodExecution("DeleteUser");
+
             await context.SaveChangesAsync();
         }
 
@@ -121,6 +138,8 @@ namespace GovAuthSDK
             using var context = new GovAuthContext();
 
             var dbTokens = await context.Tokens.AsNoTracking().ToListAsync();
+
+            LogMethodExecution("AllTokens");
 
             return dbTokens.Select(x => x.ToDto());
         }
@@ -140,6 +159,8 @@ namespace GovAuthSDK
             await context.Tokens.AddAsync(newToken);
 
             await context.SaveChangesAsync();
+
+            LogMethodExecution("AddToken");
 
             return newToken.AuthToken;
         }
@@ -161,7 +182,12 @@ namespace GovAuthSDK
 
             context.Remove(tokenDb);
 
+            LogMethodExecution("DeleteToken");
+
             await context.SaveChangesAsync();
         }
+
+        private void LogMethodExecution(string methodName) =>
+            _logger.LogInformation($"\nMethod {methodName} executed by '{_identity}' with access level '{_accessLevel}'\n");
     }
 }

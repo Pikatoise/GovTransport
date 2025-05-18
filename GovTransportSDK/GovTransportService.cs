@@ -1,4 +1,5 @@
 ﻿using GovAuthSDK;
+using GovAuthSDK.DTO;
 using GovAuthSDK.Enums;
 using GovTransportSDK.DTO;
 using GovTransportSDK.Exceptions;
@@ -6,38 +7,45 @@ using GovTransportSDK.Extensions;
 using GovTransportSDK.Helpers;
 using GovTransportSDK.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovTransportSDK
 {
     public sealed class GovTransportService
     {
+        private readonly GovAuthService _authService;
+        private readonly ILogger<GovTransportService> _logger;
         private AccessLevel _accessLevel = AccessLevel.Low;
+        private string? _identity;
 
-        public GovTransportService()
+        public GovTransportService(GovAuthService authService, ILogger<GovTransportService> logger)
         {
             using var context = new GovTransportContext();
             context.Database.EnsureCreatedAsync();
             context.Owners.FirstOrDefault();
+
+            _authService = authService;
+            _logger = logger;
         }
 
-        public async Task<string> Auth(string token)
+        public async Task<TokenDto> Auth(string token)
         {
-            var authService = new GovAuthService();
-            var authResult = await authService.TokenAuth(token);
+            var authResult = await _authService.TokenAuth(token);
 
             _accessLevel = authResult.AccessLevel;
+            _identity = authResult.TokenValue;
 
-            return authResult.Description;
+            return authResult;
         }
 
-        public async Task<string> Auth(string login, string password)
+        public async Task<UserDto> Auth(string login, string password)
         {
-            var authService = new GovAuthService();
-            var authResult = await authService.LoginAuth(login, password);
+            var authResult = await _authService.LoginAuth(login, password);
 
             _accessLevel = authResult.AccessLevel;
+            _identity = authResult.Login;
 
-            return authResult.Login;
+            return authResult;
         }
 
         #region Ownership
@@ -60,6 +68,8 @@ namespace GovTransportSDK
                 .Where(x => x.TransportId == transportDb.Id)
                 .ToListAsync();
 
+            LogMethodExecution("InfoByVin");
+
             return new VinInfoDto()
             {
                 Transport = transportDb.ToDto(),
@@ -79,6 +89,8 @@ namespace GovTransportSDK
 
             var ownersDb = await context.Owners.AsNoTracking().ToListAsync();
 
+            LogMethodExecution("AllOwners");
+
             return ownersDb;
         }
 
@@ -97,6 +109,8 @@ namespace GovTransportSDK
             if (ownerDb == null)
                 throw new OwnerNotFoundException(id);
 
+            LogMethodExecution("OwnerById");
+
             return ownerDb;
         }
 
@@ -111,6 +125,8 @@ namespace GovTransportSDK
             using var context = new GovTransportContext();
 
             var ownerDb = await context.Owners.SingleOrDefaultAsync(x => EF.Functions.Like(x.Passport, $"{passport}"));
+
+            LogMethodExecution("OwnerByPassport");
 
             return ownerDb;
         }
@@ -129,6 +145,8 @@ namespace GovTransportSDK
                 .AsNoTracking()
                 .Where(x => EF.Functions.Like(x.Passport, $"%{passport}%"))
                 .ToListAsync();
+
+            LogMethodExecution("FindOwnersByPassport");
 
             return ownersDb;
         }
@@ -156,6 +174,8 @@ namespace GovTransportSDK
 
             await context.SaveChangesAsync();
 
+            LogMethodExecution("AddOwnership");
+
             return newOwnership.Id;
         }
 
@@ -182,6 +202,8 @@ namespace GovTransportSDK
 
             context.Owners.Update(ownerWithSameId);
 
+            LogMethodExecution("UpdateOwnership");
+
             await context.SaveChangesAsync();
         }
 
@@ -206,6 +228,8 @@ namespace GovTransportSDK
                 .Where(x => x.OwnershipId == ownerId)
                 .ToListAsync();
 
+            LogMethodExecution("OwnershipTransportsHistory");
+
             return ownerTransportHistories.Select(x => x.ToDetailedDto()).ToList();
         }
 
@@ -225,6 +249,8 @@ namespace GovTransportSDK
 
             var transportsDb = await context.Transports.AsNoTracking().ToListAsync();
 
+            LogMethodExecution("AllTransports");
+
             return transportsDb;
         }
 
@@ -242,6 +268,8 @@ namespace GovTransportSDK
 
             if (transportDb == null)
                 throw new TransportNotFoundException(id);
+
+            LogMethodExecution("TransportById");
 
             return transportDb;
         }
@@ -269,6 +297,8 @@ namespace GovTransportSDK
 
             await context.SaveChangesAsync();
 
+            LogMethodExecution("AddTransport");
+
             return newTransport.Id;
         }
 
@@ -285,6 +315,8 @@ namespace GovTransportSDK
             var transportDb = await context.Transports
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => EF.Functions.Like(x.VIN, $"{vin}"));
+
+            LogMethodExecution("FindTransportByVIN");
 
             return transportDb;
         }
@@ -304,6 +336,8 @@ namespace GovTransportSDK
                 .Where(x => EF.Functions.Like(x.VIN, $"%{vin}%"))
                 .ToListAsync();
 
+            LogMethodExecution("FindTransportsByVIN");
+
             return transportsDb;
         }
 
@@ -321,6 +355,8 @@ namespace GovTransportSDK
                 .AsNoTracking()
                 .Where(x => EF.Functions.Like(x.GovNumber, $"%{govNumber}%"))
                 .ToListAsync();
+
+            LogMethodExecution("FindTransportsByGovNumber");
 
             return transportsDb;
         }
@@ -350,6 +386,8 @@ namespace GovTransportSDK
 
             context.Transports.Update(transportWithSameID);
 
+            LogMethodExecution("UpdateTransport");
+
             await context.SaveChangesAsync();
         }
 
@@ -375,6 +413,8 @@ namespace GovTransportSDK
                 .Include(x => x.Ownership)
                 .ToListAsync();
 
+            LogMethodExecution("TransportOwnersHistory");
+
             return transportOwnersHistories.Select(x => x.ToDetailedDto());
         }
 
@@ -398,6 +438,8 @@ namespace GovTransportSDK
                 .Include(x => x.Ownership)
                 .OrderBy(x => x.Start)
                 .LastOrDefaultAsync(x => x.TransportId == transportId);
+
+            LogMethodExecution("LastOwnerByTransportId");
 
             return lastOwner;
         }
@@ -425,6 +467,8 @@ namespace GovTransportSDK
 
             await context.SaveChangesAsync();
 
+            LogMethodExecution("UpdateTransportGovNumber");
+
             return newGovNumber;
         }
 
@@ -446,6 +490,8 @@ namespace GovTransportSDK
                 if (!isUnique)
                     break;
             }
+
+            LogMethodExecution("GenerateUniqueGovNumber");
 
             return newGovNumber;
         }
@@ -486,7 +532,12 @@ namespace GovTransportSDK
 
             await context.OwnerHistories.AddAsync(newHistory);
 
+            LogMethodExecution("TransportOwnerRegistration");
+
             await context.SaveChangesAsync();
         }
+
+        private void LogMethodExecution(string methodName) =>
+            _logger.LogInformation($"\nMethod {methodName} executed by '{_identity}' with access level '{_accessLevel}'\n");
     }
 }

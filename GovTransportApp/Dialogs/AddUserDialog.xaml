@@ -36,27 +36,6 @@
 				FontSize="16"
 				HorizontalAlignment="Stretch"
 				materialDesign:HintAssist.Hint="Пароль" />
-
-			<ComboBox
-				x:Name="CBoxAccessLevel"
-				Height="45"
-				BorderBrush="#3f51b5"
-				BorderThickness="2"
-				Padding="10"
-				FontFamily="Arial">
-				<ComboBox.Items>
-					<ComboBoxItem
-						Content="Low"
-						Selector.IsSelected="True"
-						Tag="0" />
-					<ComboBoxItem
-						Content="Medium"
-						Tag="1" />
-					<ComboBoxItem
-						Content="High"
-						Tag="2" />
-				</ComboBox.Items>
-			</ComboBox>
 		</StackPanel>
 
 		<Button

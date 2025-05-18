@@ -1,5 +1,4 @@
-﻿using GovAuthSDK;
-using GovAuthSDK.Enums;
+﻿using GovAuthSDK.Enums;
 using GovAuthSDK.Exceptions;
 using GovTransportSDK;
 using System.Windows;
@@ -8,7 +7,6 @@ namespace GovTransportApp.Windows
 {
     public partial class AuthWindow: Window
     {
-        GovAuthService _authService = ((App)Application.Current).AuthService!;
         GovTransportService _transportService = ((App)Application.Current).TransportService!;
 
         public AuthWindow()
@@ -29,7 +27,7 @@ namespace GovTransportApp.Windows
 
             try
             {
-                var user = await _authService.LoginAuth(login, password);
+                var user = await _transportService.Auth(login, password);
 
                 if (user.AccessLevel != AccessLevel.High)
                 {
@@ -37,8 +35,6 @@ namespace GovTransportApp.Windows
 
                     return;
                 }
-
-                await _transportService.Auth(login, password);
 
                 ((App)Application.Current).MainWindow = new MainWindow(user);
                 ((App)Application.Current).MainWindow.Show();
