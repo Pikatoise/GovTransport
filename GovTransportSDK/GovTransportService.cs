@@ -14,11 +14,11 @@ namespace GovTransportSDK
     public sealed class GovTransportService
     {
         private readonly GovAuthService _authService;
-        private readonly ILogger<GovTransportService> _logger;
+        private readonly ILogger<GovTransportService>? _logger;
         private AccessLevel _accessLevel = AccessLevel.Low;
         private string? _identity;
 
-        public GovTransportService(GovAuthService authService, ILogger<GovTransportService> logger)
+        public GovTransportService(GovAuthService authService, ILogger<GovTransportService>? logger = default)
         {
             using var context = new GovTransportContext();
             context.Database.EnsureCreatedAsync();
@@ -49,33 +49,6 @@ namespace GovTransportSDK
         }
 
         #region Ownership
-
-        /// <summary>
-        /// Low access level
-        /// </summary>
-        public async Task<VinInfoDto?> InfoByVin(string vin)
-        {
-            using var context = new GovTransportContext();
-
-            var transportDb = await context.Transports.FirstOrDefaultAsync(x => x.VIN == vin);
-
-            if (transportDb == null)
-                return null;
-
-            var historiesDb = await context.OwnerHistories
-                .AsNoTracking()
-                .Include(x => x.Ownership)
-                .Where(x => x.TransportId == transportDb.Id)
-                .ToListAsync();
-
-            LogMethodExecution("InfoByVin");
-
-            return new VinInfoDto()
-            {
-                Transport = transportDb.ToDto(),
-                History = historiesDb.Select(x => x.ToMinimizedDto())
-            };
-        }
 
         /// <summary>
         /// Medium access level
@@ -236,6 +209,33 @@ namespace GovTransportSDK
         #endregion
 
         #region Transport
+
+        /// <summary>
+        /// Low access level
+        /// </summary>
+        public async Task<VinInfoDto?> InfoByVin(string vin)
+        {
+            using var context = new GovTransportContext();
+
+            var transportDb = await context.Transports.FirstOrDefaultAsync(x => x.VIN == vin);
+
+            if (transportDb == null)
+                return null;
+
+            var historiesDb = await context.OwnerHistories
+                .AsNoTracking()
+                .Include(x => x.Ownership)
+                .Where(x => x.TransportId == transportDb.Id)
+                .ToListAsync();
+
+            LogMethodExecution("InfoByVin");
+
+            return new VinInfoDto()
+            {
+                Transport = transportDb.ToDto(),
+                History = historiesDb.Select(x => x.ToMinimizedDto())
+            };
+        }
 
         /// <summary>
         /// Medium access level
@@ -499,7 +499,7 @@ namespace GovTransportSDK
         #endregion
 
         /// <summary>
-        /// Required High level access
+        /// High level access
         /// </summary>
         public async Task TransportOwnerRegistration(Guid ownerId, Guid transportId)
         {
@@ -537,7 +537,10 @@ namespace GovTransportSDK
             await context.SaveChangesAsync();
         }
 
-        private void LogMethodExecution(string methodName) =>
-            _logger.LogInformation($"\nMethod {methodName} executed by '{_identity}' with access level '{_accessLevel}'\n");
+        private void LogMethodExecution(string methodName)
+        {
+            if (_logger != null)
+                _logger.LogInformation($"\nMethod {methodName} executed by '{_identity}' with access level '{_accessLevel}'\n");
+        }
     }
 }

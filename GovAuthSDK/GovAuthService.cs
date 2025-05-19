@@ -11,11 +11,11 @@ namespace GovAuthSDK
 {
     public sealed class GovAuthService
     {
-        private readonly ILogger<GovAuthService> _logger;
+        private readonly ILogger<GovAuthService>? _logger;
         private AccessLevel _accessLevel = AccessLevel.Low;
         private string? _identity;
 
-        public GovAuthService(ILogger<GovAuthService> logger)
+        public GovAuthService(ILogger<GovAuthService>? logger = default)
         {
             using var context = new GovAuthContext();
             context.Database.EnsureCreatedAsync();
@@ -187,7 +187,10 @@ namespace GovAuthSDK
             await context.SaveChangesAsync();
         }
 
-        private void LogMethodExecution(string methodName) =>
-            _logger.LogInformation($"\nMethod {methodName} executed by '{_identity}' with access level '{_accessLevel}'\n");
+        private void LogMethodExecution(string methodName)
+        {
+            if (_logger != null)
+                _logger.LogInformation($"\nMethod {methodName} executed by '{_identity}' with access level '{_accessLevel}'\n");
+        }
     }
 }
