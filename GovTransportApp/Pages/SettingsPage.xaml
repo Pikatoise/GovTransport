@@ -220,30 +220,67 @@
 					</StackPanel>
 				</Button>
 
-				<Button
-					x:Name="ButtonRemoveToken"
-					Click="ButtonRemoveToken_Click"
-					Grid.Column="1"
-					Height="30"
-					Background="Red"
-					BorderThickness="0"
-					materialDesign:ButtonAssist.CornerRadius="5"
-					Padding="0"
-					Margin="10 0 10 0"
-					VerticalAlignment="Top">
-					<StackPanel
-						Orientation="Horizontal">
-						<materialDesign:PackIcon
-							Kind="KeyRemove"
-							Foreground="White"
-							Height="25"
-							Width="25"
-							Margin="0 0 5 0" />
-						<TextBlock
-							Text="Удалить"
-							VerticalAlignment="Center" />
-					</StackPanel>
-				</Button>
+				<Grid
+					Grid.Column="1">
+					<Grid.RowDefinitions>
+						<RowDefinition
+							Height="*" />
+						<RowDefinition
+							Height="*"/>
+					</Grid.RowDefinitions>
+
+					<Button
+						x:Name="ButtonRemoveToken"
+						Click="ButtonRemoveToken_Click"
+						Height="30"
+						Grid.Row="0"
+						Background="Red"
+						BorderThickness="0"
+						materialDesign:ButtonAssist.CornerRadius="5"
+						Padding="0"
+						Margin="10 0 10 0"
+						VerticalAlignment="Top">
+						<StackPanel
+							Orientation="Horizontal">
+							<materialDesign:PackIcon
+								Kind="KeyRemove"
+								Foreground="White"
+								Height="25"
+								Width="25"
+								Margin="0 0 5 0" />
+							<TextBlock
+								Text="Удалить"
+								VerticalAlignment="Center" />
+						</StackPanel>
+					</Button>
+
+					<Grid Grid.Row="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition
+								Width="*" />
+							<ColumnDefinition
+								Width="*"/>
+						</Grid.ColumnDefinitions>
+
+						<Button
+							x:Name="ButtonReservCopy"
+							Click="ButtonReservCopy_Click"
+							Grid.Column="1"
+							Height="45"
+							Width="45"
+							Padding="0"
+							Background="Transparent"
+							BorderBrush="#3f51b5"
+							BorderThickness="2"
+							ToolTip="Создать резервную копию БД">
+							<materialDesign:PackIcon
+								Kind="DatabaseArrowDown"
+								Foreground="Black"
+								Height="30"
+								Width="30"/>
+						</Button>
+					</Grid>
+				</Grid>
 			</Grid>
 		</Grid>
 

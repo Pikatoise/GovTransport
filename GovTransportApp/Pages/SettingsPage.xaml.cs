@@ -1,6 +1,8 @@
 ﻿using GovAuthSDK;
 using GovAuthSDK.DTO;
 using GovTransportApp.Dialogs;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -107,6 +109,36 @@ namespace GovTransportApp.Pages
 
             var tokens = await _authService.AllTokens();
             DGridTokens.ItemsSource = tokens;
+        }
+
+        private void ButtonReservCopy_Click(object sender, RoutedEventArgs e)
+        {
+            var isAuthDbExists = File.Exists("auth.db");
+            var isTransportDbExists = File.Exists("transport.db");
+
+            if (isAuthDbExists && isTransportDbExists)
+            {
+                var dialog = new CommonOpenFileDialog
+                {
+                    IsFolderPicker = true,
+                    Title = "Выберите папку для сохранения копий БД"
+                };
+
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    string targetPath = dialog.FileName;
+
+                    string destPathAuth = Path.Combine(targetPath, "auth_copy.db");
+                    string destPathTransport = Path.Combine(targetPath, "transport_copy.db");
+
+                    File.Copy("auth.db", destPathAuth, overwrite: true);
+                    File.Copy("transport.db", destPathTransport, overwrite: true);
+
+                    MessageBox.Show("Успешно!");
+                }
+            }
+            else
+                MessageBox.Show("Файлы БД отсутствуют!");
         }
     }
 }
